@@ -17,12 +17,12 @@
     --accent: #ff7eb3;
     --accent2: #ff9a5c;
     --accent3: #5cd4a8;
-    --accent4: #7eb3ff;
-    --warn: #ffcc5c;
     --text: #3d2c2c;
     --text-muted: #a08080;
     --text-dim: #d4b8b8;
     --shadow: rgba(255,126,179,0.12);
+    --daily: #ff7eb3;
+    --weekly: #7eb3ff;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,7 +56,6 @@
     background-clip: text;
   }
   .header-left .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-
   .today { text-align: right; }
   #clock { font-family: 'Nunito', sans-serif; font-size: 24px; font-weight: 800; color: var(--accent); }
   #datestr { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
@@ -73,40 +72,23 @@
     flex-wrap: wrap;
     box-shadow: 0 4px 16px var(--shadow);
   }
-
   .who-label { font-size: 11px; color: var(--text-muted); font-weight: 700; white-space: nowrap; }
   .staff-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-
   .staff-pill {
-    padding: 5px 14px;
-    border-radius: 20px;
-    border: 2px solid var(--border);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: var(--text-muted);
-    background: var(--bg);
-    user-select: none;
+    padding: 5px 14px; border-radius: 20px; border: 2px solid var(--border);
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+    color: var(--text-muted); background: var(--bg); user-select: none;
   }
   .staff-pill:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
   .staff-pill.active { color: #fff; font-weight: 700; transform: translateY(-1px); box-shadow: 0 3px 10px var(--shadow); }
-
   .me-hint { font-size: 11px; color: var(--text-muted); margin-left: auto; }
 
-  .sync-bar {
-    display: flex; align-items: center; gap: 6px;
-    margin-bottom: 10px; font-size: 11px; color: var(--text-muted);
-  }
+  .sync-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 11px; color: var(--text-muted); }
   .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
   .sync-dot.error { background: var(--accent2); animation: none; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .toolbar {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
-  }
-  .section-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.08em; }
-
+  .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .btn {
     padding: 6px 14px; border-radius: 20px; border: 2px solid var(--border);
     background: var(--surface); color: var(--text-muted); font-size: 12px; font-weight: 600;
@@ -114,24 +96,94 @@
   }
   .btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
   .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); border-color: transparent; color: #fff; }
-  .btn.primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn.primary:hover { opacity: 0.88; }
   .btn.danger { border-color: #ffc5c5; color: #ff7070; }
   .btn.danger:hover { background: #fff0f0; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(172px, 1fr)); gap: 10px; }
-
-  .card {
-    background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
-    padding: 13px 12px 10px; display: flex; flex-direction: column; gap: 6px;
-    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-    position: relative; overflow: hidden; box-shadow: 0 2px 8px var(--shadow);
+  /* セクション */
+  .section {
+    margin-bottom: 24px;
   }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 8px 14px;
+    border-radius: 12px;
+    border: 2px solid;
+    background: var(--surface);
+  }
+
+  .section-header.daily { border-color: var(--daily); }
+  .section-header.weekly { border-color: var(--weekly); }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+  }
+  .section-header.daily .section-title { color: var(--daily); }
+  .section-header.weekly .section-title { color: var(--weekly); }
+
+  .section-count {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+
+  /* ドロップゾーン */
+  .drop-zone {
+    min-height: 80px;
+    border-radius: 12px;
+    padding: 4px;
+    transition: background 0.2s;
+  }
+  .drop-zone.drag-over {
+    background: rgba(255,126,179,0.08);
+    outline: 2px dashed var(--accent);
+  }
+  .drop-zone.weekly-zone.drag-over {
+    background: rgba(126,179,255,0.08);
+    outline: 2px dashed var(--weekly);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
+    gap: 10px;
+  }
+
+  /* カード */
+  .card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 13px 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--shadow);
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    cursor: grab;
+  }
+
+  .card:active { cursor: grabbing; }
+  .card.dragging { opacity: 0.4; transform: scale(0.97); }
+  .card.drag-over-card { border-color: var(--accent); transform: translateY(-3px); }
+
   .card:not(.editing):hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
 
-  .card-top { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+  .card-top { display: flex; align-items: flex-start; gap: 8px; }
   .card .icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
   .card .card-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; }
   .card .url-hint { font-size: 10px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .card-link { cursor: pointer; }
+  .card-link:hover .card-name { color: var(--accent); }
 
   .confirmed-area {
     margin-top: 2px; border-top: 1px dashed var(--border); padding-top: 6px;
@@ -140,9 +192,9 @@
 
   .confirmed-chip {
     padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700;
-    display: flex; align-items: center; gap: 3px; cursor: pointer; transition: opacity 0.15s, transform 0.1s;
+    display: flex; align-items: center; gap: 3px; cursor: pointer; transition: opacity 0.15s;
   }
-  .confirmed-chip:hover { opacity: 0.7; transform: scale(0.95); }
+  .confirmed-chip:hover { opacity: 0.7; }
   .chip-dot { width: 6px; height: 6px; border-radius: 50%; }
 
   .confirm-btn {
@@ -150,7 +202,7 @@
     background: transparent; color: var(--text-muted); font-size: 11px; font-weight: 600;
     cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s;
   }
-  .confirm-btn:hover:not(:disabled) { border-color: var(--accent3); color: var(--accent3); background: #f0fff9; transform: scale(1.05); }
+  .confirm-btn:hover:not(:disabled) { border-color: var(--accent3); color: var(--accent3); background: #f0fff9; }
   .confirm-btn.done { border-style: solid; border-color: var(--accent3); color: var(--accent3); background: #f0fff9; cursor: default; }
   .confirm-btn:disabled:not(.done) { opacity: 0.4; cursor: default; }
 
@@ -160,6 +212,7 @@
   .card.all-confirmed { border-color: var(--accent3); background: linear-gradient(135deg, #f0fff9, #ffffff); }
   .card.all-confirmed::after { content: '✨'; position: absolute; top: 6px; right: 8px; font-size: 14px; }
 
+  /* 編集モード */
   .card.editing { border-color: var(--accent2); cursor: default; }
   .name-input, .url-input {
     background: var(--bg); border: 2px solid var(--border); border-radius: 8px;
@@ -176,13 +229,20 @@
   }
   .editing-mode .del-btn { display: flex; }
 
+  .drag-handle {
+    position: absolute; top: 6px; left: 6px;
+    font-size: 12px; color: var(--text-dim); cursor: grab;
+    display: none;
+  }
+  .editing-mode .drag-handle { display: block; }
+
   .add-card {
     background: transparent; border: 2px dashed var(--border); border-radius: 16px;
     padding: 16px; display: flex; flex-direction: column; align-items: center;
     justify-content: center; gap: 4px; cursor: pointer; color: var(--text-dim);
-    font-size: 12px; font-weight: 600; transition: border-color 0.2s, color 0.2s, transform 0.15s; min-height: 80px;
+    font-size: 12px; font-weight: 600; transition: border-color 0.2s, color 0.2s; min-height: 80px;
   }
-  .add-card:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+  .add-card:hover { border-color: var(--accent); color: var(--accent); }
 
   .legend {
     display: flex; gap: 14px; flex-wrap: wrap; margin-top: 18px;
@@ -190,6 +250,10 @@
   }
   .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); font-weight: 600; }
   .legend-color { width: 10px; height: 10px; border-radius: 3px; }
+
+  .empty-hint {
+    text-align: center; color: var(--text-dim); font-size: 12px; padding: 20px;
+  }
 </style>
 </head>
 <body>
@@ -217,48 +281,66 @@
 </div>
 
 <div class="toolbar">
-  <span class="section-label">🔗 LINKS</span>
   <span style="flex:1"></span>
-  <button class="btn" id="editBtn" onclick="toggleEdit()">✏️ 編集</button>
+  <button class="btn" id="editBtn" onclick="toggleEdit()">✏️ 編集・並べ替え</button>
   <button class="btn primary" id="saveBtn" onclick="saveAll()" style="display:none">💾 保存</button>
   <button class="btn danger" onclick="resetDay()">🔄 本日リセット</button>
 </div>
 
-<div class="grid" id="grid"></div>
+<!-- 日次セクション -->
+<div class="section">
+  <div class="section-header daily">
+    <span>📅</span>
+    <span class="section-title">日次</span>
+    <span class="section-count" id="dailyCount"></span>
+  </div>
+  <div class="drop-zone daily-zone" id="dailyZone">
+    <div class="grid" id="dailyGrid"></div>
+  </div>
+</div>
+
+<!-- 週次セクション -->
+<div class="section">
+  <div class="section-header weekly">
+    <span>📆</span>
+    <span class="section-title">週次</span>
+    <span class="section-count" id="weeklyCount"></span>
+  </div>
+  <div class="drop-zone weekly-zone" id="weeklyZone">
+    <div class="grid" id="weeklyGrid"></div>
+  </div>
+</div>
 
 <div class="legend">
   <div class="legend-item"><div class="legend-color" style="background:var(--accent3)"></div>確認済み</div>
   <div class="legend-item"><div class="legend-color" style="background:var(--border)"></div>未確認</div>
   <div class="legend-item">✨ 全員確認済み</div>
+  <div class="legend-item" style="margin-left:auto;color:var(--text-dim)">✏️編集モードでドラッグ移動可</div>
 </div>
 
 <script>
-// ===== Firebase設定 =====
-const firebaseConfig = {
-  databaseURL: "https://misato-dashboard-default-rtdb.firebaseio.com/"
-};
+const firebaseConfig = { databaseURL: "https://misato-dashboard-default-rtdb.firebaseio.com/" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ===== 設定 =====
 const STAFF = ['榮','池田','藏下','小橋川','大西','兼本','松田','予備'];
 const COLORS = ['#ff7eb3','#ff9a5c','#5cd4a8','#7eb3ff','#c47eff','#ffcc5c','#ff7070','#a0c4ff'];
 const staffColor = {};
 STAFF.forEach((s,i) => staffColor[s] = COLORS[i]);
 
 const DEFAULT_LINKS = [
-  {id:1,  name:'仮押さえ',     url:'', icon:'📌'},
-  {id:2,  name:'貢献度',       url:'', icon:'📊'},
-  {id:3,  name:'TODO',         url:'', icon:'✅'},
-  {id:4,  name:'名義変更',     url:'', icon:'📝'},
-  {id:5,  name:'審査不可',     url:'', icon:'🚫'},
-  {id:6,  name:'シフト',       url:'', icon:'📅'},
-  {id:7,  name:'勉強時間',     url:'', icon:'📚'},
-  {id:8,  name:'役割分担',     url:'', icon:'👥'},
-  {id:9,  name:'計画道路',     url:'', icon:'🗺️'},
-  {id:10, name:'新築工程管理', url:'', icon:'🏗️'},
-  {id:11, name:'書類未回収',   url:'', icon:'📋'},
-  {id:12, name:'火災保険',     url:'', icon:'🔥'},
+  {id:1,  name:'仮押さえ',     url:'', icon:'📌', category:'daily', order:0},
+  {id:2,  name:'貢献度',       url:'', icon:'📊', category:'daily', order:1},
+  {id:3,  name:'TODO',         url:'', icon:'✅', category:'daily', order:2},
+  {id:4,  name:'名義変更',     url:'', icon:'📝', category:'daily', order:3},
+  {id:5,  name:'審査不可',     url:'', icon:'🚫', category:'daily', order:4},
+  {id:6,  name:'シフト',       url:'', icon:'📅', category:'daily', order:5},
+  {id:7,  name:'勉強時間',     url:'', icon:'📚', category:'daily', order:6},
+  {id:8,  name:'役割分担',     url:'', icon:'👥', category:'daily', order:7},
+  {id:9,  name:'計画道路',     url:'', icon:'🗺️', category:'daily', order:8},
+  {id:10, name:'新築工程管理', url:'', icon:'🏗️', category:'daily', order:9},
+  {id:11, name:'書類未回収',   url:'', icon:'📋', category:'daily', order:10},
+  {id:12, name:'火災保険',     url:'', icon:'🔥', category:'daily', order:11},
 ];
 
 let links = [];
@@ -266,8 +348,10 @@ let confirmData = {};
 let currentUser = localStorage.getItem('misato_me') || '';
 let editing = false;
 let nextId = 13;
+let dragSrcId = null;
+let dragSrcCategory = null;
 
-// ===== 時計 =====
+// 時計
 function updateClock() {
   const now = new Date();
   const pad = n => String(n).padStart(2,'0');
@@ -284,13 +368,12 @@ function todayKey() {
   return `${n.getFullYear()}_${String(n.getMonth()+1).padStart(2,'0')}_${String(n.getDate()).padStart(2,'0')}`;
 }
 
-// ===== Firebase読み込み =====
+// Firebase
 function initFirebase() {
-  // リンクデータ
   db.ref('links').on('value', snap => {
     const val = snap.val();
     if (val) {
-      links = Object.values(val).sort((a,b) => a.id - b.id);
+      links = Object.values(val).sort((a,b) => (a.order||0) - (b.order||0));
       nextId = Math.max(...links.map(l=>l.id), 0) + 1;
     } else {
       links = DEFAULT_LINKS;
@@ -298,11 +381,8 @@ function initFirebase() {
     }
     if (!editing) render();
     setSyncOk('接続済み・リアルタイム同期中');
-  }, err => {
-    setSyncError('接続エラー');
   });
 
-  // 確認データ（今日分）
   db.ref(`confirms/${todayKey()}`).on('value', snap => {
     confirmData = snap.val() || {};
     if (!editing) render();
@@ -318,7 +398,7 @@ function setSyncError(msg) {
   document.getElementById('syncText').textContent = msg;
 }
 
-// ===== スタッフ =====
+// スタッフ
 function renderStaff() {
   const wrap = document.getElementById('staffPills');
   wrap.innerHTML = '';
@@ -344,7 +424,7 @@ function selectUser(name) {
   render();
 }
 
-// ===== 確認 =====
+// 確認
 function getConfirmedNames(linkId) {
   return confirmData[linkId] ? Object.values(confirmData[linkId]) : [];
 }
@@ -352,100 +432,208 @@ function getConfirmedNames(linkId) {
 function toggleConfirm(linkId) {
   if (!currentUser) { alert('まず名前を選んでください'); return; }
   const confirmed = getConfirmedNames(linkId);
-  const idx = confirmed.indexOf(currentUser);
-  if (idx >= 0) {
-    // 取消
-    db.ref(`confirms/${todayKey()}/${linkId}`).transaction(current => {
-      if (!current) return {};
-      const filtered = Object.fromEntries(
-        Object.entries(current).filter(([k,v]) => v !== currentUser)
-      );
-      return filtered;
-    });
+  if (confirmed.includes(currentUser)) {
+    db.ref(`confirms/${todayKey()}/${linkId}/${currentUser}`).remove();
   } else {
-    // 追加
     db.ref(`confirms/${todayKey()}/${linkId}/${currentUser}`).set(currentUser);
   }
 }
 
-// ===== レンダリング =====
+// レンダリング
 function render() {
   renderStaff();
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
-  if (editing) grid.parentElement.classList.add('editing-mode');
-  else grid.parentElement.classList.remove('editing-mode');
+  const dailyGrid = document.getElementById('dailyGrid');
+  const weeklyGrid = document.getElementById('weeklyGrid');
+  dailyGrid.innerHTML = '';
+  weeklyGrid.innerHTML = '';
 
-  links.forEach(link => {
-    const confirmed = getConfirmedNames(link.id);
-    const allConfirmed = confirmed.length >= STAFF.length;
-    const iConfirmed = confirmed.includes(currentUser);
+  if (editing) {
+    document.body.classList.add('editing-mode');
+  } else {
+    document.body.classList.remove('editing-mode');
+  }
 
-    const card = document.createElement('div');
-    card.className = 'card' + (editing ? ' editing' : '') + (allConfirmed && !editing ? ' all-confirmed' : '');
-    card.dataset.id = link.id;
+  const dailyLinks = links.filter(l => (l.category||'daily') === 'daily');
+  const weeklyLinks = links.filter(l => l.category === 'weekly');
 
-    if (editing) {
-      card.innerHTML = `
-        <div class="card-top">
-          <div class="icon">${link.icon}</div>
-          <input class="name-input" value="${esc(link.name)}" placeholder="名前">
-        </div>
-        <input class="url-input" value="${esc(link.url)}" placeholder="https://...">
-        <button class="del-btn" onclick="deleteCard(${link.id})">✕</button>
-      `;
-    } else {
-      const urlHint = link.url ? link.url.replace(/^https?:\/\//,'').substring(0,28) : 'URLなし';
-      const pending = STAFF.filter(s => !confirmed.includes(s));
+  document.getElementById('dailyCount').textContent = `${dailyLinks.length}件`;
+  document.getElementById('weeklyCount').textContent = `${weeklyLinks.length}件`;
 
-      const chipsHtml = confirmed.map(name => {
-        const col = staffColor[name] || '#aaa';
-        return `<div class="confirmed-chip" style="background:${col}22;border:1px solid ${col}88;color:${col}" onclick="toggleConfirm(${link.id})" title="${name}をクリックで取消">
-          <div class="chip-dot" style="background:${col}"></div>${name}
-        </div>`;
-      }).join('');
+  if (dailyLinks.length === 0) {
+    dailyGrid.innerHTML = '<div class="empty-hint">ここにカードをドラッグして追加</div>';
+  }
+  if (weeklyLinks.length === 0) {
+    weeklyGrid.innerHTML = '<div class="empty-hint">ここにカードをドラッグして追加</div>';
+  }
 
-      const btnClass = iConfirmed ? 'confirm-btn done' : 'confirm-btn';
-      const btnLabel = iConfirmed ? '✓ 確認済み' : (currentUser ? '確認する' : 'ログイン要');
-      const btnClick = iConfirmed ? '' : `onclick="toggleConfirm(${link.id})"`;
-      const btnDisabled = (!currentUser || iConfirmed) ? 'disabled' : '';
-
-      const dotsHtml = pending.length > 0
-        ? `<div class="pending-dots">${pending.map(n=>`<div class="pending-dot" title="${n}未確認"></div>`).join('')}</div>`
-        : '';
-
-      card.innerHTML = `
-        <div class="card-top" onclick="${link.url ? `window.open('${link.url}','_blank')` : ''}">
-          <div class="icon">${link.icon}</div>
-          <div>
-            <div class="card-name">${esc(link.name)}</div>
-            <div class="url-hint">${urlHint}</div>
-          </div>
-        </div>
-        <div class="confirmed-area">
-          ${chipsHtml}
-          <button class="${btnClass}" ${btnDisabled} ${btnClick}>${btnLabel}</button>
-          ${dotsHtml}
-        </div>
-      `;
-    }
+  [...dailyLinks, ...weeklyLinks].forEach(link => {
+    const grid = (link.category||'daily') === 'daily' ? dailyGrid : weeklyGrid;
+    const card = createCard(link);
     grid.appendChild(card);
   });
 
+  // 追加ボタン
   if (editing) {
-    const add = document.createElement('div');
-    add.className = 'add-card';
-    add.innerHTML = `<span style="font-size:22px">＋</span><span>追加</span>`;
-    add.onclick = addCard;
-    grid.appendChild(add);
+    const addDaily = document.createElement('div');
+    addDaily.className = 'add-card';
+    addDaily.innerHTML = `<span style="font-size:22px">＋</span><span>日次に追加</span>`;
+    addDaily.onclick = () => addCard('daily');
+    dailyGrid.appendChild(addDaily);
+
+    const addWeekly = document.createElement('div');
+    addWeekly.className = 'add-card';
+    addWeekly.innerHTML = `<span style="font-size:22px">＋</span><span>週次に追加</span>`;
+    addWeekly.onclick = () => addCard('weekly');
+    weeklyGrid.appendChild(addWeekly);
   }
+
+  setupDropZones();
+}
+
+function createCard(link) {
+  const confirmed = getConfirmedNames(link.id);
+  const allConfirmed = confirmed.length >= STAFF.length;
+  const iConfirmed = confirmed.includes(currentUser);
+
+  const card = document.createElement('div');
+  card.className = 'card' + (editing ? ' editing' : '') + (allConfirmed && !editing ? ' all-confirmed' : '');
+  card.dataset.id = link.id;
+  card.dataset.category = link.category || 'daily';
+  card.draggable = editing;
+
+  if (editing) {
+    card.innerHTML = `
+      <div class="drag-handle">⠿⠿</div>
+      <div class="card-top">
+        <div class="icon">${link.icon}</div>
+        <input class="name-input" value="${esc(link.name)}" placeholder="名前">
+      </div>
+      <input class="url-input" value="${esc(link.url)}" placeholder="https://...">
+      <button class="del-btn" onclick="deleteCard(${link.id})">✕</button>
+    `;
+
+    card.addEventListener('dragstart', e => {
+      dragSrcId = link.id;
+      dragSrcCategory = link.category || 'daily';
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      document.querySelectorAll('.drag-over-card').forEach(c => c.classList.remove('drag-over-card'));
+    });
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      card.classList.add('drag-over-card');
+    });
+    card.addEventListener('dragleave', () => {
+      card.classList.remove('drag-over-card');
+    });
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      card.classList.remove('drag-over-card');
+      if (dragSrcId === link.id) return;
+      reorderCards(dragSrcId, link.id, link.category || 'daily');
+    });
+  } else {
+    const urlHint = link.url ? link.url.replace(/^https?:\/\//,'').substring(0,28) : 'URLなし';
+    const pending = STAFF.filter(s => !confirmed.includes(s));
+    const chipsHtml = confirmed.map(name => {
+      const col = staffColor[name] || '#aaa';
+      return `<div class="confirmed-chip" style="background:${col}22;border:1px solid ${col}88;color:${col}" onclick="toggleConfirm(${link.id})" title="${name}をクリックで取消">
+        <div class="chip-dot" style="background:${col}"></div>${name}
+      </div>`;
+    }).join('');
+    const btnClass = iConfirmed ? 'confirm-btn done' : 'confirm-btn';
+    const btnLabel = iConfirmed ? '✓ 確認済み' : (currentUser ? '確認する' : 'ログイン要');
+    const btnClick = iConfirmed ? '' : `onclick="toggleConfirm(${link.id})"`;
+    const btnDisabled = (!currentUser || iConfirmed) ? 'disabled' : '';
+    const dotsHtml = pending.length > 0
+      ? `<div class="pending-dots">${pending.map(n=>`<div class="pending-dot" title="${n}未確認"></div>`).join('')}</div>`
+      : '';
+
+    card.innerHTML = `
+      <div class="card-top card-link" onclick="${link.url ? `window.open('${link.url}','_blank')` : ''}">
+        <div class="icon">${link.icon}</div>
+        <div>
+          <div class="card-name">${esc(link.name)}</div>
+          <div class="url-hint">${urlHint}</div>
+        </div>
+      </div>
+      <div class="confirmed-area">
+        ${chipsHtml}
+        <button class="${btnClass}" ${btnDisabled} ${btnClick}>${btnLabel}</button>
+        ${dotsHtml}
+      </div>
+    `;
+  }
+  return card;
+}
+
+// ドロップゾーン設定
+function setupDropZones() {
+  ['dailyZone','weeklyZone'].forEach(zoneId => {
+    const zone = document.getElementById(zoneId);
+    const category = zoneId === 'dailyZone' ? 'daily' : 'weekly';
+
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', e => {
+      if (!zone.contains(e.relatedTarget)) {
+        zone.classList.remove('drag-over');
+      }
+    });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      if (dragSrcId !== null) {
+        moveToCategory(dragSrcId, category);
+      }
+    });
+  });
+}
+
+// カテゴリ移動
+function moveToCategory(id, newCategory) {
+  const link = links.find(l => l.id === id);
+  if (!link || link.category === newCategory) return;
+  link.category = newCategory;
+  const catLinks = links.filter(l => (l.category||'daily') === newCategory);
+  link.order = catLinks.length * 10;
+  db.ref(`links/${id}`).update({ category: newCategory, order: link.order });
+  render();
+}
+
+// 並べ替え
+function reorderCards(srcId, targetId, targetCategory) {
+  const srcLink = links.find(l => l.id === srcId);
+  const targetLink = links.find(l => l.id === targetId);
+  if (!srcLink || !targetLink) return;
+
+  srcLink.category = targetCategory;
+  const catLinks = links.filter(l => (l.category||'daily') === targetCategory).sort((a,b)=>a.order-b.order);
+  const targetIdx = catLinks.findIndex(l => l.id === targetId);
+
+  // 並べ替え
+  const filtered = catLinks.filter(l => l.id !== srcId);
+  filtered.splice(targetIdx, 0, srcLink);
+  filtered.forEach((l, i) => { l.order = i * 10; });
+
+  // Firebase更新
+  const updates = {};
+  filtered.forEach(l => { updates[`links/${l.id}`] = l; });
+  db.ref().update(updates);
+  render();
 }
 
 function esc(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ===== 編集 =====
+// 編集
 function toggleEdit() {
   editing = true;
   document.getElementById('editBtn').style.display = 'none';
@@ -470,8 +658,9 @@ function saveAll() {
   render();
 }
 
-function addCard() {
-  const newLink = { id: nextId++, name: '新しいリンク', url: '', icon: '🔗' };
+function addCard(category) {
+  const catLinks = links.filter(l => (l.category||'daily') === category);
+  const newLink = { id: nextId++, name: '新しいリンク', url: '', icon: '🔗', category, order: catLinks.length * 10 };
   links.push(newLink);
   db.ref(`links/${newLink.id}`).set(newLink);
   render();
@@ -489,7 +678,6 @@ function resetDay() {
   db.ref(`confirms/${todayKey()}`).remove();
 }
 
-// ===== 起動 =====
 initFirebase();
 </script>
 </body>
