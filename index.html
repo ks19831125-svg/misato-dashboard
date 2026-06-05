@@ -23,6 +23,8 @@
     --shadow: rgba(255,126,179,0.12);
     --daily: #ff7eb3;
     --weekly: #7eb3ff;
+    --monthly: #5cd4a8;
+    --other: #ffcc5c;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,6 +62,7 @@
   #clock { font-family: 'Nunito', sans-serif; font-size: 24px; font-weight: 800; color: var(--accent); }
   #datestr { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
 
+  /* WHO BAR */
   .who-bar {
     background: var(--surface);
     border: 2px solid var(--border);
@@ -81,13 +84,15 @@
   }
   .staff-pill:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
   .staff-pill.active { color: #fff; font-weight: 700; transform: translateY(-1px); box-shadow: 0 3px 10px var(--shadow); }
-  .me-hint { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+  .me-hint { font-size: 11px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
 
+  /* SYNC */
   .sync-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 11px; color: var(--text-muted); }
   .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
   .sync-dot.error { background: var(--accent2); animation: none; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
+  /* TOOLBAR */
   .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
   .btn {
     padding: 6px 14px; border-radius: 20px; border: 2px solid var(--border);
@@ -97,99 +102,71 @@
   .btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
   .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); border-color: transparent; color: #fff; }
   .btn.primary:hover { opacity: 0.88; }
-  .btn.danger { border-color: #ffc5c5; color: #ff7070; }
-  .btn.danger:hover { background: #fff0f0; }
+  .btn.purple { background: linear-gradient(135deg, #c47eff, #a05cff); border-color: transparent; color: #fff; }
+  .btn.purple:hover { opacity: 0.88; }
 
-  /* セクション */
-  .section {
-    margin-bottom: 24px;
-  }
-
+  /* SECTION */
+  .section { margin-bottom: 20px; }
   .section-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
-    padding: 8px 14px;
-    border-radius: 12px;
-    border: 2px solid;
-    background: var(--surface);
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 8px; padding: 8px 14px;
+    border-radius: 12px; border: 2px solid; background: var(--surface);
   }
-
   .section-header.daily { border-color: var(--daily); }
   .section-header.weekly { border-color: var(--weekly); }
+  .section-header.monthly { border-color: var(--monthly); }
+  .section-header.other { border-color: var(--other); }
 
-  .section-title {
-    font-size: 13px;
-    font-weight: 800;
-    font-family: 'Nunito', sans-serif;
-  }
+  .section-title { font-size: 13px; font-weight: 800; font-family: 'Nunito', sans-serif; }
   .section-header.daily .section-title { color: var(--daily); }
   .section-header.weekly .section-title { color: var(--weekly); }
+  .section-header.monthly .section-title { color: var(--monthly); }
+  .section-header.other .section-title { color: var(--other); }
 
-  .section-count {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-left: auto;
-  }
+  .section-count { font-size: 11px; color: var(--text-muted); }
 
-  /* ドロップゾーン */
-  .drop-zone {
-    min-height: 80px;
-    border-radius: 12px;
-    padding: 4px;
-    transition: background 0.2s;
+  .reset-btn {
+    padding: 3px 10px; border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.5);
+    font-size: 11px; font-weight: 600; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; color: var(--text-muted);
+    transition: all 0.15s; margin-left: auto;
   }
-  .drop-zone.drag-over {
-    background: rgba(255,126,179,0.08);
-    outline: 2px dashed var(--accent);
-  }
-  .drop-zone.weekly-zone.drag-over {
-    background: rgba(126,179,255,0.08);
-    outline: 2px dashed var(--weekly);
-  }
+  .reset-btn:hover { background: rgba(255,255,255,0.9); }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
-    gap: 10px;
-  }
+  /* DROP ZONE */
+  .drop-zone { min-height: 80px; border-radius: 12px; padding: 4px; transition: background 0.2s; }
+  .drop-zone.drag-over { background: rgba(255,126,179,0.08); outline: 2px dashed var(--accent); }
+  .drop-zone.weekly-zone.drag-over { background: rgba(126,179,255,0.08); outline: 2px dashed var(--weekly); }
+  .drop-zone.monthly-zone.drag-over { background: rgba(92,212,168,0.08); outline: 2px dashed var(--monthly); }
+  .drop-zone.other-zone.drag-over { background: rgba(255,204,92,0.08); outline: 2px dashed var(--other); }
 
-  /* カード */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(172px, 1fr)); gap: 10px; }
+
+  /* CARD */
   .card {
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 16px;
-    padding: 13px 12px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 2px 8px var(--shadow);
+    background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
+    padding: 13px 12px 10px; display: flex; flex-direction: column; gap: 6px;
+    position: relative; overflow: hidden; box-shadow: 0 2px 8px var(--shadow);
     transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-    cursor: grab;
   }
-
-  .card:active { cursor: grabbing; }
-  .card.dragging { opacity: 0.4; transform: scale(0.97); }
-  .card.drag-over-card { border-color: var(--accent); transform: translateY(-3px); }
-
   .card:not(.editing):hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); }
+  .card.dragging { opacity: 0.4; transform: scale(0.97); cursor: grabbing; }
+  .card.drag-over-card { border-color: var(--accent); transform: translateY(-3px); }
+  .card.all-confirmed { border-color: var(--accent3); background: linear-gradient(135deg, #f0fff9, #ffffff); }
+  .card.all-confirmed::after { content: '✨'; position: absolute; top: 6px; right: 8px; font-size: 14px; }
+  .card.editing { border-color: var(--accent2); }
 
-  .card-top { display: flex; align-items: flex-start; gap: 8px; }
+  .card-top { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+  .card-top:hover .card-name { color: var(--accent); }
   .card .icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
   .card .card-name { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.3; }
   .card .url-hint { font-size: 10px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-  .card-link { cursor: pointer; }
-  .card-link:hover .card-name { color: var(--accent); }
 
   .confirmed-area {
     margin-top: 2px; border-top: 1px dashed var(--border); padding-top: 6px;
     display: flex; flex-wrap: wrap; gap: 3px; align-items: center; min-height: 26px;
   }
-
   .confirmed-chip {
     padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700;
     display: flex; align-items: center; gap: 3px; cursor: pointer; transition: opacity 0.15s;
@@ -209,11 +186,6 @@
   .pending-dots { display: flex; gap: 3px; align-items: center; margin-left: auto; }
   .pending-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
 
-  .card.all-confirmed { border-color: var(--accent3); background: linear-gradient(135deg, #f0fff9, #ffffff); }
-  .card.all-confirmed::after { content: '✨'; position: absolute; top: 6px; right: 8px; font-size: 14px; }
-
-  /* 編集モード */
-  .card.editing { border-color: var(--accent2); cursor: default; }
   .name-input, .url-input {
     background: var(--bg); border: 2px solid var(--border); border-radius: 8px;
     color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 12px;
@@ -230,9 +202,8 @@
   .editing-mode .del-btn { display: flex; }
 
   .drag-handle {
-    position: absolute; top: 6px; left: 6px;
-    font-size: 12px; color: var(--text-dim); cursor: grab;
-    display: none;
+    position: absolute; top: 6px; left: 6px; font-size: 12px;
+    color: var(--text-dim); cursor: grab; display: none;
   }
   .editing-mode .drag-handle { display: block; }
 
@@ -244,16 +215,58 @@
   }
   .add-card:hover { border-color: var(--accent); color: var(--accent); }
 
+  .empty-hint { text-align: center; color: var(--text-dim); font-size: 12px; padding: 20px; }
+
+  /* スタッフ管理モーダル */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+  }
+  .modal {
+    background: var(--surface); border-radius: 20px; padding: 24px;
+    width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    max-height: 80vh; overflow-y: auto;
+  }
+  .modal h2 {
+    font-family: 'Nunito', sans-serif; font-size: 18px; font-weight: 800;
+    color: var(--accent); margin-bottom: 16px;
+  }
+  .staff-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .staff-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; background: var(--bg); border-radius: 10px;
+    border: 2px solid var(--border);
+  }
+  .staff-color-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .staff-name-input {
+    flex: 1; background: transparent; border: none; outline: none;
+    font-family: 'Noto Sans JP', sans-serif; font-size: 14px; font-weight: 600;
+    color: var(--text);
+  }
+  .staff-del-btn {
+    width: 24px; height: 24px; border-radius: 50%; background: #fff0f0;
+    border: 2px solid #ffc5c5; color: #ff7070; font-size: 12px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .add-staff-row {
+    display: flex; gap: 8px; align-items: center;
+  }
+  .add-staff-input {
+    flex: 1; padding: 8px 12px; border-radius: 10px; border: 2px solid var(--border);
+    background: var(--bg); font-family: 'Noto Sans JP', sans-serif; font-size: 14px;
+    outline: none; color: var(--text);
+  }
+  .add-staff-input:focus { border-color: var(--accent); }
+  .modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
   .legend {
     display: flex; gap: 14px; flex-wrap: wrap; margin-top: 18px;
     padding-top: 14px; border-top: 2px dashed var(--border);
   }
   .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); font-weight: 600; }
   .legend-color { width: 10px; height: 10px; border-radius: 3px; }
-
-  .empty-hint {
-    text-align: center; color: var(--text-dim); font-size: 12px; padding: 20px;
-  }
 </style>
 </head>
 <body>
@@ -282,40 +295,71 @@
 
 <div class="toolbar">
   <span style="flex:1"></span>
+  <button class="btn purple" onclick="openStaffModal()">👥 担当者管理</button>
   <button class="btn" id="editBtn" onclick="toggleEdit()">✏️ 編集・並べ替え</button>
   <button class="btn primary" id="saveBtn" onclick="saveAll()" style="display:none">💾 保存</button>
-  <button class="btn danger" onclick="resetDay()">🔄 本日リセット</button>
 </div>
 
-<!-- 日次セクション -->
+<!-- 日次 -->
 <div class="section">
   <div class="section-header daily">
-    <span>📅</span>
-    <span class="section-title">日次</span>
+    <span>📅</span><span class="section-title">日次</span>
     <span class="section-count" id="dailyCount"></span>
+    <button class="reset-btn" onclick="resetCategory('daily')">🔄 リセット</button>
   </div>
-  <div class="drop-zone daily-zone" id="dailyZone">
-    <div class="grid" id="dailyGrid"></div>
-  </div>
+  <div class="drop-zone daily-zone" id="dailyZone"><div class="grid" id="dailyGrid"></div></div>
 </div>
 
-<!-- 週次セクション -->
+<!-- 週次 -->
 <div class="section">
   <div class="section-header weekly">
-    <span>📆</span>
-    <span class="section-title">週次</span>
+    <span>📆</span><span class="section-title">週次</span>
     <span class="section-count" id="weeklyCount"></span>
+    <button class="reset-btn" onclick="resetCategory('weekly')">🔄 リセット</button>
   </div>
-  <div class="drop-zone weekly-zone" id="weeklyZone">
-    <div class="grid" id="weeklyGrid"></div>
+  <div class="drop-zone weekly-zone" id="weeklyZone"><div class="grid" id="weeklyGrid"></div></div>
+</div>
+
+<!-- 月次 -->
+<div class="section">
+  <div class="section-header monthly">
+    <span>🗓️</span><span class="section-title">月次</span>
+    <span class="section-count" id="monthlyCount"></span>
+    <button class="reset-btn" onclick="resetCategory('monthly')">🔄 リセット</button>
   </div>
+  <div class="drop-zone monthly-zone" id="monthlyZone"><div class="grid" id="monthlyGrid"></div></div>
+</div>
+
+<!-- その他 -->
+<div class="section">
+  <div class="section-header other">
+    <span>📂</span><span class="section-title">その他</span>
+    <span class="section-count" id="otherCount"></span>
+    <button class="reset-btn" onclick="resetCategory('other')">🔄 リセット</button>
+  </div>
+  <div class="drop-zone other-zone" id="otherZone"><div class="grid" id="otherGrid"></div></div>
 </div>
 
 <div class="legend">
   <div class="legend-item"><div class="legend-color" style="background:var(--accent3)"></div>確認済み</div>
-  <div class="legend-item"><div class="legend-color" style="background:var(--border)"></div>未確認</div>
   <div class="legend-item">✨ 全員確認済み</div>
   <div class="legend-item" style="margin-left:auto;color:var(--text-dim)">✏️編集モードでドラッグ移動可</div>
+</div>
+
+<!-- スタッフ管理モーダル -->
+<div class="modal-overlay" id="staffModal" style="display:none">
+  <div class="modal">
+    <h2>👥 担当者管理</h2>
+    <div class="staff-list" id="staffList"></div>
+    <div class="add-staff-row">
+      <input class="add-staff-input" id="newStaffInput" placeholder="新しい担当者名を入力">
+      <button class="btn primary" onclick="addStaff()">追加</button>
+    </div>
+    <div class="modal-btns">
+      <button class="btn" onclick="closeStaffModal()">キャンセル</button>
+      <button class="btn primary" onclick="saveStaff()">💾 保存</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -323,10 +367,16 @@ const firebaseConfig = { databaseURL: "https://misato-dashboard-default-rtdb.fir
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const STAFF = ['榮','池田','藏下','小橋川','大西','兼本','松田','予備'];
-const COLORS = ['#ff7eb3','#ff9a5c','#5cd4a8','#7eb3ff','#c47eff','#ffcc5c','#ff7070','#a0c4ff'];
+const DEFAULT_STAFF = ['榮','池田','藏下','小橋川','大西','兼本','松田','予備'];
+const COLORS = ['#ff7eb3','#ff9a5c','#5cd4a8','#7eb3ff','#c47eff','#ffcc5c','#ff7070','#a0c4ff','#f7a8d4','#a8d4f7','#a8f7d4','#f7d4a8'];
+
+let staffList = [...DEFAULT_STAFF];
+let tempStaffList = [];
 const staffColor = {};
-STAFF.forEach((s,i) => staffColor[s] = COLORS[i]);
+
+function assignColors() {
+  staffList.forEach((s,i) => staffColor[s] = COLORS[i % COLORS.length]);
+}
 
 const DEFAULT_LINKS = [
   {id:1,  name:'仮押さえ',     url:'', icon:'📌', category:'daily', order:0},
@@ -349,7 +399,6 @@ let currentUser = localStorage.getItem('misato_me') || '';
 let editing = false;
 let nextId = 13;
 let dragSrcId = null;
-let dragSrcCategory = null;
 
 // 時計
 function updateClock() {
@@ -370,6 +419,19 @@ function todayKey() {
 
 // Firebase
 function initFirebase() {
+  // スタッフ
+  db.ref('staff').on('value', snap => {
+    const val = snap.val();
+    if (val) staffList = Array.isArray(val) ? val : Object.values(val);
+    else {
+      staffList = [...DEFAULT_STAFF];
+      db.ref('staff').set(staffList);
+    }
+    assignColors();
+    if (!editing) render();
+  });
+
+  // リンク
   db.ref('links').on('value', snap => {
     const val = snap.val();
     if (val) {
@@ -383,6 +445,7 @@ function initFirebase() {
     setSyncOk('接続済み・リアルタイム同期中');
   });
 
+  // 確認データ
   db.ref(`confirms/${todayKey()}`).on('value', snap => {
     confirmData = snap.val() || {};
     if (!editing) render();
@@ -402,12 +465,13 @@ function setSyncError(msg) {
 function renderStaff() {
   const wrap = document.getElementById('staffPills');
   wrap.innerHTML = '';
-  STAFF.forEach(name => {
+  staffList.forEach(name => {
     const pill = document.createElement('div');
     pill.className = 'staff-pill' + (currentUser === name ? ' active' : '');
     if (currentUser === name) {
-      pill.style.background = `linear-gradient(135deg, ${staffColor[name]}, ${staffColor[name]}bb)`;
-      pill.style.borderColor = staffColor[name];
+      const col = staffColor[name] || '#ff7eb3';
+      pill.style.background = `linear-gradient(135deg, ${col}, ${col}bb)`;
+      pill.style.borderColor = col;
     }
     pill.textContent = name;
     pill.onclick = () => selectUser(name);
@@ -421,6 +485,59 @@ function selectUser(name) {
   currentUser = name;
   localStorage.setItem('misato_me', name);
   renderStaff();
+  render();
+}
+
+// スタッフ管理モーダル
+function openStaffModal() {
+  tempStaffList = [...staffList];
+  renderStaffModal();
+  document.getElementById('staffModal').style.display = 'flex';
+}
+
+function closeStaffModal() {
+  document.getElementById('staffModal').style.display = 'none';
+}
+
+function renderStaffModal() {
+  const list = document.getElementById('staffList');
+  list.innerHTML = '';
+  tempStaffList.forEach((name, idx) => {
+    const row = document.createElement('div');
+    row.className = 'staff-row';
+    const col = COLORS[idx % COLORS.length];
+    row.innerHTML = `
+      <div class="staff-color-dot" style="background:${col}"></div>
+      <input class="staff-name-input" value="${esc(name)}" onchange="tempStaffList[${idx}]=this.value">
+      <button class="staff-del-btn" onclick="removeStaff(${idx})">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function addStaff() {
+  const input = document.getElementById('newStaffInput');
+  const name = input.value.trim();
+  if (!name) return;
+  tempStaffList.push(name);
+  input.value = '';
+  renderStaffModal();
+}
+
+function removeStaff(idx) {
+  if (!confirm(`「${tempStaffList[idx]}」を削除しますか？`)) return;
+  tempStaffList.splice(idx, 1);
+  renderStaffModal();
+}
+
+function saveStaff() {
+  // 入力欄の値を取得
+  const inputs = document.querySelectorAll('.staff-name-input');
+  tempStaffList = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
+  staffList = [...tempStaffList];
+  db.ref('staff').set(staffList);
+  assignColors();
+  closeStaffModal();
   render();
 }
 
@@ -439,60 +556,54 @@ function toggleConfirm(linkId) {
   }
 }
 
+// リセット
+function resetCategory(category) {
+  const names = {daily:'日次', weekly:'週次', monthly:'月次', other:'その他'};
+  if (!confirm(`${names[category]}の確認記録をリセットしますか？`)) return;
+  const catLinks = links.filter(l => (l.category||'daily') === category);
+  const updates = {};
+  catLinks.forEach(link => { updates[`confirms/${todayKey()}/${link.id}`] = null; });
+  db.ref().update(updates);
+}
+
 // レンダリング
 function render() {
   renderStaff();
-  const dailyGrid = document.getElementById('dailyGrid');
-  const weeklyGrid = document.getElementById('weeklyGrid');
-  dailyGrid.innerHTML = '';
-  weeklyGrid.innerHTML = '';
+  const grids = {
+    daily: document.getElementById('dailyGrid'),
+    weekly: document.getElementById('weeklyGrid'),
+    monthly: document.getElementById('monthlyGrid'),
+    other: document.getElementById('otherGrid'),
+  };
+  Object.values(grids).forEach(g => g.innerHTML = '');
+  if (editing) document.body.classList.add('editing-mode');
+  else document.body.classList.remove('editing-mode');
 
-  if (editing) {
-    document.body.classList.add('editing-mode');
-  } else {
-    document.body.classList.remove('editing-mode');
-  }
-
-  const dailyLinks = links.filter(l => (l.category||'daily') === 'daily');
-  const weeklyLinks = links.filter(l => l.category === 'weekly');
-
-  document.getElementById('dailyCount').textContent = `${dailyLinks.length}件`;
-  document.getElementById('weeklyCount').textContent = `${weeklyLinks.length}件`;
-
-  if (dailyLinks.length === 0) {
-    dailyGrid.innerHTML = '<div class="empty-hint">ここにカードをドラッグして追加</div>';
-  }
-  if (weeklyLinks.length === 0) {
-    weeklyGrid.innerHTML = '<div class="empty-hint">ここにカードをドラッグして追加</div>';
-  }
-
-  [...dailyLinks, ...weeklyLinks].forEach(link => {
-    const grid = (link.category||'daily') === 'daily' ? dailyGrid : weeklyGrid;
-    const card = createCard(link);
-    grid.appendChild(card);
+  const cats = ['daily','weekly','monthly','other'];
+  cats.forEach(cat => {
+    const catLinks = links.filter(l => (l.category||'daily') === cat);
+    const countId = cat + 'Count';
+    document.getElementById(countId).textContent = `${catLinks.length}件`;
+    if (catLinks.length === 0) {
+      grids[cat].innerHTML = '<div class="empty-hint">ここにカードをドラッグして追加</div>';
+    }
+    catLinks.forEach(link => grids[cat].appendChild(createCard(link)));
+    if (editing) {
+      const add = document.createElement('div');
+      add.className = 'add-card';
+      const catName = {daily:'日次', weekly:'週次', monthly:'月次', other:'その他'}[cat];
+      add.innerHTML = `<span style="font-size:22px">＋</span><span>${catName}に追加</span>`;
+      add.onclick = () => addCard(cat);
+      grids[cat].appendChild(add);
+    }
   });
-
-  // 追加ボタン
-  if (editing) {
-    const addDaily = document.createElement('div');
-    addDaily.className = 'add-card';
-    addDaily.innerHTML = `<span style="font-size:22px">＋</span><span>日次に追加</span>`;
-    addDaily.onclick = () => addCard('daily');
-    dailyGrid.appendChild(addDaily);
-
-    const addWeekly = document.createElement('div');
-    addWeekly.className = 'add-card';
-    addWeekly.innerHTML = `<span style="font-size:22px">＋</span><span>週次に追加</span>`;
-    addWeekly.onclick = () => addCard('weekly');
-    weeklyGrid.appendChild(addWeekly);
-  }
 
   setupDropZones();
 }
 
 function createCard(link) {
   const confirmed = getConfirmedNames(link.id);
-  const allConfirmed = confirmed.length >= STAFF.length;
+  const allConfirmed = confirmed.length >= staffList.length && staffList.length > 0;
   const iConfirmed = confirmed.includes(currentUser);
 
   const card = document.createElement('div');
@@ -511,10 +622,8 @@ function createCard(link) {
       <input class="url-input" value="${esc(link.url)}" placeholder="https://...">
       <button class="del-btn" onclick="deleteCard(${link.id})">✕</button>
     `;
-
     card.addEventListener('dragstart', e => {
       dragSrcId = link.id;
-      dragSrcCategory = link.category || 'daily';
       card.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'move';
     });
@@ -522,23 +631,16 @@ function createCard(link) {
       card.classList.remove('dragging');
       document.querySelectorAll('.drag-over-card').forEach(c => c.classList.remove('drag-over-card'));
     });
-    card.addEventListener('dragover', e => {
-      e.preventDefault();
-      card.classList.add('drag-over-card');
-    });
-    card.addEventListener('dragleave', () => {
-      card.classList.remove('drag-over-card');
-    });
+    card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('drag-over-card'); });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over-card'));
     card.addEventListener('drop', e => {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       card.classList.remove('drag-over-card');
-      if (dragSrcId === link.id) return;
-      reorderCards(dragSrcId, link.id, link.category || 'daily');
+      if (dragSrcId !== link.id) reorderCards(dragSrcId, link.id, link.category || 'daily');
     });
   } else {
     const urlHint = link.url ? link.url.replace(/^https?:\/\//,'').substring(0,28) : 'URLなし';
-    const pending = STAFF.filter(s => !confirmed.includes(s));
+    const pending = staffList.filter(s => !confirmed.includes(s));
     const chipsHtml = confirmed.map(name => {
       const col = staffColor[name] || '#aaa';
       return `<div class="confirmed-chip" style="background:${col}22;border:1px solid ${col}88;color:${col}" onclick="toggleConfirm(${link.id})" title="${name}をクリックで取消">
@@ -552,14 +654,10 @@ function createCard(link) {
     const dotsHtml = pending.length > 0
       ? `<div class="pending-dots">${pending.map(n=>`<div class="pending-dot" title="${n}未確認"></div>`).join('')}</div>`
       : '';
-
     card.innerHTML = `
-      <div class="card-top card-link" onclick="${link.url ? `window.open('${link.url}','_blank')` : ''}">
+      <div class="card-top" onclick="${link.url ? `window.open('${link.url}','_blank')` : ''}">
         <div class="icon">${link.icon}</div>
-        <div>
-          <div class="card-name">${esc(link.name)}</div>
-          <div class="url-hint">${urlHint}</div>
-        </div>
+        <div><div class="card-name">${esc(link.name)}</div><div class="url-hint">${urlHint}</div></div>
       </div>
       <div class="confirmed-area">
         ${chipsHtml}
@@ -571,32 +669,19 @@ function createCard(link) {
   return card;
 }
 
-// ドロップゾーン設定
 function setupDropZones() {
-  ['dailyZone','weeklyZone'].forEach(zoneId => {
+  ['dailyZone','weeklyZone','monthlyZone','otherZone'].forEach(zoneId => {
     const zone = document.getElementById(zoneId);
-    const category = zoneId === 'dailyZone' ? 'daily' : 'weekly';
-
-    zone.addEventListener('dragover', e => {
-      e.preventDefault();
-      zone.classList.add('drag-over');
-    });
-    zone.addEventListener('dragleave', e => {
-      if (!zone.contains(e.relatedTarget)) {
-        zone.classList.remove('drag-over');
-      }
-    });
+    const cat = zoneId === 'dailyZone' ? 'daily' : zoneId === 'weeklyZone' ? 'weekly' : zoneId === 'monthlyZone' ? 'monthly' : 'other';
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', e => { if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over'); });
     zone.addEventListener('drop', e => {
-      e.preventDefault();
-      zone.classList.remove('drag-over');
-      if (dragSrcId !== null) {
-        moveToCategory(dragSrcId, category);
-      }
+      e.preventDefault(); zone.classList.remove('drag-over');
+      if (dragSrcId !== null) moveToCategory(dragSrcId, cat);
     });
   });
 }
 
-// カテゴリ移動
 function moveToCategory(id, newCategory) {
   const link = links.find(l => l.id === id);
   if (!link || link.category === newCategory) return;
@@ -607,22 +692,16 @@ function moveToCategory(id, newCategory) {
   render();
 }
 
-// 並べ替え
 function reorderCards(srcId, targetId, targetCategory) {
   const srcLink = links.find(l => l.id === srcId);
   const targetLink = links.find(l => l.id === targetId);
   if (!srcLink || !targetLink) return;
-
   srcLink.category = targetCategory;
   const catLinks = links.filter(l => (l.category||'daily') === targetCategory).sort((a,b)=>a.order-b.order);
   const targetIdx = catLinks.findIndex(l => l.id === targetId);
-
-  // 並べ替え
   const filtered = catLinks.filter(l => l.id !== srcId);
   filtered.splice(targetIdx, 0, srcLink);
   filtered.forEach((l, i) => { l.order = i * 10; });
-
-  // Firebase更新
   const updates = {};
   filtered.forEach(l => { updates[`links/${l.id}`] = l; });
   db.ref().update(updates);
@@ -633,7 +712,6 @@ function esc(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// 編集
 function toggleEdit() {
   editing = true;
   document.getElementById('editBtn').style.display = 'none';
@@ -673,11 +751,7 @@ function deleteCard(id) {
   render();
 }
 
-function resetDay() {
-  if (!confirm(`本日の確認記録をリセットしますか？`)) return;
-  db.ref(`confirms/${todayKey()}`).remove();
-}
-
+assignColors();
 initFirebase();
 </script>
 </body>
