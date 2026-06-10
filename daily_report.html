@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美里店 朝礼・予定管理</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #fff8f5;
+    --surface: #ffffff;
+    --border: #ffd6c8;
+    --accent: #ff7eb3;
+    --accent2: #ff9a5c;
+    --accent3: #5cd4a8;
+    --text: #1a1010;
+    --text-muted: #6b4f4f;
+    --text-dim: #9a7a7a;
+    --shadow: rgba(255,126,179,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(circle at 10% 10%, #ffe8f5 0%, transparent 50%),
+                      radial-gradient(circle at 90% 90%, #e8f0ff 0%, transparent 50%);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    padding: 20px 24px;
+  }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; padding-bottom: 14px; border-bottom: 2px dashed var(--border);
+    position: sticky; top: 0; z-index: 101;
+    background: rgba(255,248,245,0.97); backdrop-filter: blur(10px);
+  }
+  .header-left h1 {
+    font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .header-left .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .today { text-align: right; }
+  #clock { font-family: 'Nunito', sans-serif; font-size: 24px; font-weight: 800; color: var(--accent); }
+  #datestr { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+  .sync-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; font-size: 11px; color: var(--text-muted); }
+
+  .alert-bar {
+    background: #fff0f0; border: 2px solid #ffc5c5; border-radius: 12px;
+    padding: 10px 16px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .alert-bar.hidden { display: none; }
+  .alert-title { font-size: 13px; font-weight: 700; color: #ff5555; white-space: nowrap; }
+  .alert-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .alert-chip {
+    padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 700;
+    background: #ffe0e0; color: #ff5555; border: 1px solid #ffb5b5;
+  }
+
+  .time-alert {
+    background: linear-gradient(135deg, #fff3e0, #fff0f0);
+    border: 2px solid #ffaa55; border-radius: 12px;
+    padding: 12px 16px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .time-alert.hidden { display: none; }
+  .time-alert-title { font-size: 13px; font-weight: 700; color: #ff7700; }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .section {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
+    padding: 16px; margin-bottom: 20px; box-shadow: 0 4px 16px var(--shadow);
+  }
+
+  .section-title {
+    font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title.today-title { color: var(--accent); }
+  .section-title.tomorrow-title { color: #7eb3ff; }
+
+  .date-label {
+    font-size: 12px; color: var(--text-muted); font-weight: 600; margin-left: auto;
+  }
+
+  /* テーブル */
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+
+  th {
+    background: var(--bg); padding: 8px 12px; text-align: center;
+    font-weight: 700; color: var(--text-muted); border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  th.name-col { text-align: left; }
+
+  td {
+    padding: 8px 12px; text-align: center; border-bottom: 1px dashed var(--border);
+    vertical-align: middle;
+  }
+  td.name-col {
+    text-align: left; font-weight: 700; color: var(--text);
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr.total-row td {
+    background: linear-gradient(135deg, #fff0f8, #fff8f0);
+    font-weight: 800; border-top: 2px solid var(--border);
+    color: var(--accent);
+  }
+  tr.total-row td.name-col { color: var(--accent); }
+
+  /* 入力 */
+  .num-input {
+    width: 52px; padding: 4px 6px; border-radius: 8px;
+    border: 2px solid var(--border); background: var(--bg);
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+    text-align: center; color: var(--text); outline: none;
+    transition: border-color 0.15s;
+  }
+  .num-input:focus { border-color: var(--accent); }
+  .num-input:disabled { background: transparent; border-color: transparent; color: var(--text); }
+
+  /* 合計バッジ */
+  .total-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 10px;
+    font-weight: 800; font-size: 14px;
+  }
+  .badge-pink { background: #ffe8f5; color: var(--accent); }
+  .badge-blue { background: #e8f0ff; color: #5c7ebf; }
+  .badge-green { background: #e8fff8; color: #3a9e7a; }
+  .badge-yellow { background: #fffde8; color: #9e7a1a; }
+
+  /* ボタン */
+  .btn {
+    padding: 6px 14px; border-radius: 20px; border: 2px solid var(--border);
+    background: var(--surface); color: var(--text-muted); font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); border-color: transparent; color: #fff; }
+  .btn.primary:hover { opacity: 0.88; }
+
+  .toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+
+  /* 名前バッジ */
+  .staff-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 10px; font-size: 13px; font-weight: 700;
+  }
+  .staff-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--text-muted); font-size: 12px; font-weight: 600;
+    text-decoration: none; margin-bottom: 14px;
+    padding: 6px 12px; border-radius: 20px; border: 2px solid var(--border);
+    background: var(--surface); transition: all 0.15s; cursor: pointer;
+  }
+  .back-link:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>📊 美里店 朝礼・予定管理</h1>
+    <div class="sub">MISATO BRANCH · MORNING REPORT</div>
+  </div>
+  <div class="today">
+    <div id="clock">--:--</div>
+    <div id="datestr">----/--/--</div>
+  </div>
+</header>
+
+<div class="sync-bar">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncText">接続中...</span>
+</div>
+
+<div class="alert-bar hidden" id="alertBar">
+  <span class="alert-title">⚠️ 翌日予定未入力：</span>
+  <div class="alert-chips" id="alertChips"></div>
+</div>
+
+<div class="time-alert hidden" id="timeAlert">
+  <span class="time-alert-title">🕕 18:00を過ぎました！翌日予定を入力して退勤してください</span>
+  <div class="alert-chips" id="timeAlertChips"></div>
+</div>
+
+<div class="toolbar">
+  <button class="back-link" onclick="goBack()">← ダッシュボードへ</button>
+  <span style="flex:1"></span>
+  <button class="btn primary" onclick="saveAll()">💾 保存</button>
+</div>
+
+<!-- 当日実績 -->
+<div class="section">
+  <div class="section-title today-title">
+    📅 本日予定（朝礼時入力）
+    <span class="date-label" id="todayLabel"></span>
+    <button class="btn" onclick="resetTable('today')" style="margin-left:8px;font-size:11px;padding:4px 10px">🔄 リセット</button>
+  </div>
+  <div class="table-wrap">
+    <table id="todayTable">
+      <thead>
+        <tr>
+          <th class="name-col">担当者</th>
+          <th>面談</th>
+          <th>案内</th>
+          <th>契約</th>
+          <th>写真撮り</th>
+        </tr>
+      </thead>
+      <tbody id="todayBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 翌日予定 -->
+<div class="section">
+  <div class="section-title tomorrow-title">
+    📆 翌日予定（退勤前入力）
+    <span class="date-label" id="tomorrowLabel"></span>
+    <button class="btn" onclick="resetTable('tomorrow')" style="margin-left:8px;font-size:11px;padding:4px 10px">🔄 リセット</button>
+  </div>
+  <div class="table-wrap">
+    <table id="tomorrowTable">
+      <thead>
+        <tr>
+          <th class="name-col">担当者</th>
+          <th>面談</th>
+          <th>案内</th>
+          <th>契約</th>
+          <th>写真撮り</th>
+        </tr>
+      </thead>
+      <tbody id="tomorrowBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = { databaseURL: "https://misato-dashboard-default-rtdb.firebaseio.com/" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const STAFF_COLORS = ['#ff7eb3','#ff9a5c','#5cd4a8','#7eb3ff','#c47eff','#ffcc5c','#ff7070','#a0c4ff'];
+const FIELDS = ['面談','案内','契約','写真撮り'];
+const FIELD_KEYS = ['mendan','annai','keiyaku','shashin'];
+const BADGE_CLASSES = ['badge-pink','badge-blue','badge-green','badge-yellow'];
+
+let staffList = [];
+let reportData = {}; // { dateKey: { staffName: { mendan:0, annai:0, keiyaku:0, shashin:0 } } }
+
+function updateClock() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('clock').textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const days = ['日','月','火','水','木','金','土'];
+  document.getElementById('datestr').textContent =
+    `${now.getFullYear()}/${pad(now.getMonth()+1)}/${pad(now.getDate())} (${days[now.getDay()]})`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function dateKey(offset = 0) {
+  const n = new Date();
+  n.setDate(n.getDate() + offset);
+  return `${n.getFullYear()}_${String(n.getMonth()+1).padStart(2,'0')}_${String(n.getDate()).padStart(2,'0')}`;
+}
+
+function dateLabel(offset = 0) {
+  const n = new Date();
+  n.setDate(n.getDate() + offset);
+  const days = ['日','月','火','水','木','金','土'];
+  const pad = x => String(x).padStart(2,'0');
+  return `${n.getFullYear()}/${pad(n.getMonth()+1)}/${pad(n.getDate())} (${days[n.getDay()]})`;
+}
+
+function initFirebase() {
+  db.ref('staff').on('value', snap => {
+    const val = snap.val();
+    staffList = val ? (Array.isArray(val) ? val : Object.values(val)) : ['榮','池田','藏下','小橋川','大西','兼本','松田','予備'];
+    loadReport();
+  });
+}
+
+function loadReport() {
+  db.ref('report').on('value', snap => {
+    reportData = snap.val() || {};
+
+    // 自動引き継ぎ：本日データがなく、昨日の翌日予定があれば自動コピー
+    const todayKey_ = dateKey(0);
+    const yesterdayTomorrowKey = dateKey(-1);
+    const todayData = reportData[todayKey_];
+    const yesterdayTomorrowData = reportData[yesterdayTomorrowKey];
+
+    const todayHasData = todayData && Object.values(todayData).some(staff =>
+      Object.values(staff).some(v => v > 0)
+    );
+
+    if (!todayHasData && yesterdayTomorrowData) {
+      // 昨日の翌日予定を本日予定にコピー
+      const updates = {};
+      Object.entries(yesterdayTomorrowData).forEach(([name, fields]) => {
+        Object.entries(fields).forEach(([field, val]) => {
+          updates['report/' + todayKey_ + '/' + name + '/' + field] = val;
+        });
+      });
+      db.ref().update(updates).then(() => {
+        setSyncOk('昨日の翌日予定を本日予定に自動引き継ぎしました ✓');
+      });
+      return; // onValueが再度発火するので一旦return
+    }
+
+    renderTable('todayBody', dateKey(0));
+    renderTable('tomorrowBody', dateKey(1));
+    document.getElementById('todayLabel').textContent = dateLabel(0);
+    document.getElementById('tomorrowLabel').textContent = dateLabel(1);
+    setSyncOk('同期済み');
+    checkAlert();
+    checkTimeAlert();
+  });
+}
+
+function renderTable(tbodyId, key) {
+  const tbody = document.getElementById(tbodyId);
+  tbody.innerHTML = '';
+  const totals = {mendan:0, annai:0, keiyaku:0, shashin:0};
+
+  staffList.filter(name => name !== '松田').forEach((name, idx) => {
+    const col = STAFF_COLORS[idx % STAFF_COLORS.length];
+    const data = (reportData[key] && reportData[key][name]) || {};
+    const tr = document.createElement('tr');
+
+    let cells = `<td class="name-col">
+      <span class="staff-badge" style="background:${col}22;color:${col}">
+        <span class="staff-dot" style="background:${col}"></span>${name}
+      </span>
+    </td>`;
+
+    FIELD_KEYS.forEach(fkey => {
+      const val = data[fkey] || 0;
+      totals[fkey] += val;
+      cells += `<td><input class="num-input" type="number" min="0" value="${val}"
+        data-key="${key}" data-name="${name}" data-field="${fkey}"
+        onchange="updateValue(this)"></td>`;
+    });
+
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+
+  // 合計行
+  const totalTr = document.createElement('tr');
+  totalTr.className = 'total-row';
+  let totalCells = `<td class="name-col">合計</td>`;
+  FIELD_KEYS.forEach((fkey, i) => {
+    totalCells += `<td><span class="total-badge ${BADGE_CLASSES[i]}" id="total_${tbodyId}_${fkey}">${totals[fkey]}</span></td>`;
+  });
+  totalTr.innerHTML = totalCells;
+  tbody.appendChild(totalTr);
+}
+
+function updateValue(input) {
+  const key = input.dataset.key;
+  const name = input.dataset.name;
+  const field = input.dataset.field;
+  const val = parseInt(input.value) || 0;
+
+  db.ref(`report/${key}/${name}/${field}`).set(val);
+
+  // 合計更新
+  const tbodyId = key === dateKey(0) ? 'todayBody' : 'tomorrowBody';
+  updateTotal(tbodyId, key, field);
+}
+
+function updateTotal(tbodyId, key, field) {
+  const inputs = document.querySelectorAll(`#${tbodyId} input[data-field="${field}"]`);
+  let total = 0;
+  inputs.forEach(inp => { total += parseInt(inp.value) || 0; });
+  const badge = document.getElementById(`total_${tbodyId}_${field}`);
+  if (badge) badge.textContent = total;
+}
+
+function saveAll() {
+  const inputs = document.querySelectorAll('.num-input');
+  const updates = {};
+  inputs.forEach(inp => {
+    const key = inp.dataset.key;
+    const name = inp.dataset.name;
+    const field = inp.dataset.field;
+    const val = parseInt(inp.value) || 0;
+    updates[`report/${key}/${name}/${field}`] = val;
+  });
+  db.ref().update(updates).then(() => {
+    setSyncOk('保存しました ✓');
+  });
+}
+
+function goBack() {
+  window.location.href = 'index.html';
+}
+
+function setSyncOk(msg) {
+  document.getElementById('syncDot').className = 'sync-dot';
+  document.getElementById('syncText').textContent = msg;
+}
+
+function checkTimeAlert() {
+  const now = new Date();
+  const hour = now.getHours();
+  const timeAlert = document.getElementById('timeAlert');
+  const timeChips = document.getElementById('timeAlertChips');
+
+  if (hour >= 18) {
+    const key = dateKey(1);
+    const data = reportData[key] || {};
+    const missing = staffList.filter(name => name !== '松田').filter(name => {
+      const staffData = data[name];
+      if (!staffData) return true;
+      return FIELD_KEYS.every(f => !staffData[f] || staffData[f] === 0);
+    });
+    if (missing.length > 0) {
+      timeAlert.classList.remove('hidden');
+      timeChips.innerHTML = missing.map(n => '<span class="alert-chip">' + n + '</span>').join('');
+    } else {
+      timeAlert.classList.add('hidden');
+    }
+  } else {
+    timeAlert.classList.add('hidden');
+  }
+}
+
+function checkAlert() {
+  const key = dateKey(1);
+  const data = reportData[key] || {};
+  const missing = staffList.filter(name => name !== '松田').filter(name => {
+    const staffData = data[name];
+    if (!staffData) return true;
+    return FIELD_KEYS.every(f => !staffData[f] || staffData[f] === 0);
+  });
+  const bar = document.getElementById('alertBar');
+  const chips = document.getElementById('alertChips');
+  if (missing.length > 0) {
+    bar.classList.remove('hidden');
+    chips.innerHTML = missing.map(n => '<span class="alert-chip">' + n + '</span>').join('');
+  } else {
+    bar.classList.add('hidden');
+  }
+}
+
+function resetTable(which) {
+  const key = which === 'today' ? dateKey(0) : dateKey(1);
+  const label = which === 'today' ? '本日予定' : '翌日予定';
+  if (!confirm(label + 'をリセットしますか？')) return;
+  const updates = {};
+  staffList.filter(name => name !== '松田').forEach(name => {
+    FIELD_KEYS.forEach(fkey => {
+      updates['report/' + key + '/' + name + '/' + fkey] = 0;
+    });
+  });
+  db.ref().update(updates).then(() => setSyncOk(label + 'をリセットしました'));
+}
+
+setInterval(checkTimeAlert, 60000);
+initFirebase();
+</script>
+</body>
+</html>
