@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>美里店 管理者ページ</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1f2436;
+    --border: #2a2f45;
+    --accent: #4f8ef7;
+    --accent2: #f7794f;
+    --accent3: #4fd4a8;
+    --accent4: #c47eff;
+    --warn: #f7c94f;
+    --text: #e8eaf6;
+    --text-muted: #6b7299;
+    --text-dim: #3d4466;
+    --shadow: rgba(79,142,247,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(circle at 10% 10%, #1a2040 0%, transparent 50%),
+                      radial-gradient(circle at 90% 90%, #1a1535 0%, transparent 50%);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    padding: 20px 24px;
+  }
+
+  /* ログイン画面 */
+  .login-wrap {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 20px;
+  }
+  .login-box {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 20px;
+    padding: 40px; width: 100%; max-width: 360px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    text-align: center;
+  }
+  .login-title {
+    font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent4));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 8px;
+  }
+  .login-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+  .pw-input {
+    width: 100%; padding: 12px 16px; border-radius: 12px;
+    border: 2px solid var(--border); background: var(--surface2);
+    color: var(--text); font-size: 16px; outline: none; margin-bottom: 12px;
+    font-family: 'Noto Sans JP', sans-serif; text-align: center; letter-spacing: 4px;
+  }
+  .pw-input:focus { border-color: var(--accent); }
+  .login-btn {
+    width: 100%; padding: 12px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent4));
+    color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; transition: opacity 0.15s;
+  }
+  .login-btn:hover { opacity: 0.88; }
+  .login-error { font-size: 12px; color: #ff7070; margin-top: 8px; display: none; }
+
+  /* メインページ */
+  .main-wrap { display: none; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px; padding-bottom: 14px; border-bottom: 2px solid var(--border);
+    position: sticky; top: 0; z-index: 101;
+    background: rgba(15,17,23,0.97); backdrop-filter: blur(10px);
+  }
+  .header-left h1 {
+    font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent4));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .header-left .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  #clock { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 800; color: var(--accent); text-align:right; }
+  #datestr { font-size: 11px; color: var(--text-muted); text-align:right; }
+
+  .toolbar { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .btn {
+    padding: 6px 14px; border-radius: 20px; border: 2px solid var(--border);
+    background: var(--surface); color: var(--text-muted); font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent4)); border-color: transparent; color: #fff; }
+
+  .section {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
+    padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 16px var(--shadow);
+  }
+  .section-title {
+    font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 800;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+
+  /* 朝礼スクリプト */
+  .script-box {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px; font-size: 14px; line-height: 2; color: var(--text);
+    white-space: pre-wrap; margin-bottom: 12px; min-height: 120px;
+  }
+  .copy-btn {
+    padding: 8px 20px; border-radius: 20px; border: none;
+    background: linear-gradient(135deg, var(--accent3), #3ab890);
+    color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s;
+  }
+  .copy-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .copy-btn.copied { background: linear-gradient(135deg, #aaa, #888); }
+
+  /* 月間集計 */
+  .month-nav {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .month-nav select {
+    padding: 6px 12px; border-radius: 10px; border: 2px solid var(--border);
+    background: var(--surface2); color: var(--text); font-size: 13px; outline: none;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .month-nav select:focus { border-color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    background: var(--surface2); padding: 8px 12px; text-align: center;
+    font-weight: 700; color: var(--text-muted); border-bottom: 2px solid var(--border); white-space: nowrap;
+  }
+  th.name-col { text-align: left; }
+  td { padding: 8px 12px; text-align: center; border-bottom: 1px solid var(--border); }
+  td.name-col { text-align: left; font-weight: 700; }
+  tr:last-child td { border-bottom: none; }
+  tr.total-row td { background: var(--surface2); font-weight: 800; border-top: 2px solid var(--border); color: var(--accent); }
+
+  .num-badge { display: inline-block; padding: 2px 10px; border-radius: 8px; font-weight: 700; font-size: 13px; }
+  .b1 { background: #1a2540; color: #4f8ef7; }
+  .b2 { background: #1e1535; color: #c47eff; }
+  .b3 { background: #0e2520; color: #4fd4a8; }
+  .b4 { background: #2a1a10; color: #f7794f; }
+
+  /* 目標設定 */
+  .goal-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px;
+  }
+  .goal-card {
+    background: var(--surface2); border: 2px solid var(--border); border-radius: 12px;
+    padding: 14px; text-align: center;
+  }
+  .goal-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+  .goal-input {
+    width: 80px; padding: 6px; border-radius: 8px; border: 2px solid var(--border);
+    background: var(--bg); color: var(--text); font-size: 18px; font-weight: 800;
+    text-align: center; outline: none; font-family: 'Nunito', sans-serif;
+  }
+  .goal-input:focus { border-color: var(--accent); }
+  .goal-unit { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .progress-bar {
+    width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-top: 8px; overflow: hidden;
+  }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+  .progress-text { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  .sync-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 14px; font-size: 11px; color: var(--text-muted); }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .staff-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 8px; font-size: 12px; font-weight: 700; }
+  .staff-dot { width: 7px; height: 7px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-title">🔐 管理者ページ</div>
+    <div class="login-sub">MISATO BRANCH · MANAGER ONLY</div>
+    <input class="pw-input" type="password" id="pwInput" placeholder="パスワード" onkeydown="if(event.key==='Enter')checkPw()">
+    <button class="login-btn" onclick="checkPw()">ログイン</button>
+    <div class="login-error" id="loginError">パスワードが違います</div>
+  </div>
+</div>
+
+<!-- メイン画面 -->
+<div class="main-wrap" id="mainWrap">
+
+<header>
+  <div class="header-left">
+    <h1>🔐 管理者ページ</h1>
+    <div class="sub">MISATO BRANCH · MANAGER ONLY</div>
+  </div>
+  <div>
+    <div id="clock">--:--</div>
+    <div id="datestr">----/--/--</div>
+  </div>
+</header>
+
+<div class="sync-bar">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncText">接続中...</span>
+</div>
+
+<div class="toolbar">
+  <button class="btn" onclick="window.location.href='index.html'">← ダッシュボード</button>
+  <button class="btn" onclick="window.location.href='daily_report.html'">📊 予定管理</button>
+  <button class="btn" onclick="logout()">🔓 ログアウト</button>
+</div>
+
+<!-- 朝礼スクリプト -->
+<div class="section">
+  <div class="section-title" style="color:var(--accent)">📢 朝礼スクリプト</div>
+  <div class="script-box" id="scriptBox">読み込み中...</div>
+  <button class="copy-btn" id="copyBtn" onclick="copyScript()">📋 コピーする</button>
+</div>
+
+<!-- 月間集計 -->
+<div class="section">
+  <div class="section-title" style="color:var(--accent3)">📊 月間集計</div>
+  <div class="month-nav">
+    <select id="yearSel" onchange="loadMonthly()"></select>
+    <select id="monthSel" onchange="loadMonthly()">
+      <option value="01">1月</option><option value="02">2月</option><option value="03">3月</option>
+      <option value="04">4月</option><option value="05">5月</option><option value="06">6月</option>
+      <option value="07">7月</option><option value="08">8月</option><option value="09">9月</option>
+      <option value="10">10月</option><option value="11">11月</option><option value="12">12月</option>
+    </select>
+    <span id="monthTotal" style="font-size:12px;color:var(--text-muted)"></span>
+  </div>
+  <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th class="name-col">担当者</th>
+          <th>面談</th><th>案内</th><th>契約</th><th>写真撮り</th>
+        </tr>
+      </thead>
+      <tbody id="monthlyBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 目標設定 -->
+<div class="section">
+  <div class="section-title" style="color:var(--accent4)">🎯 月間目標</div>
+  <div class="goal-grid" id="goalGrid"></div>
+  <div style="margin-top:12px">
+    <button class="btn primary" onclick="saveGoals()">💾 目標を保存</button>
+  </div>
+</div>
+
+</div><!-- /main-wrap -->
+
+<script>
+const firebaseConfig = { databaseURL: "https://misato-dashboard-default-rtdb.firebaseio.com/" };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const PASSWORD = 'misato2024';
+const COLORS = ['#4f8ef7','#f7794f','#4fd4a8','#c47eff','#f7c94f','#06b6d4','#10b981','#8b5cf6'];
+const FIELD_KEYS = ['mendan','annai','keiyaku','shashin'];
+const FIELD_NAMES = ['\u9762\u8ac7','\u6848\u5185','\u5951\u7d04','\u5199\u771f\u64ae\u308a'];
+const BADGE_CLASSES = ['b1','b2','b3','b4'];
+const EXCLUDE = ['\u69ae','\u677e\u7530'];
+
+let staffList = [];
+let reportData = {};
+let goalData = {};
+
+// パスワード
+function checkPw() {
+  const pw = document.getElementById('pwInput').value;
+  if (pw === PASSWORD) {
+    sessionStorage.setItem('mgr_auth', '1');
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('mainWrap').style.display = 'block';
+    init();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('mgr_auth');
+  location.reload();
+}
+
+// 時計
+function updateClock() {
+  const now = new Date();
+  const pad = function(n) { return String(n).padStart(2,'0'); };
+  document.getElementById('clock').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
+  const days = ['\u65e5','\u6708','\u706b','\u6c34','\u6728','\u91d1','\u571f'];
+  document.getElementById('datestr').textContent =
+    now.getFullYear() + '/' + pad(now.getMonth()+1) + '/' + pad(now.getDate()) + ' (' + days[now.getDay()] + ')';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function dateKey(offset) {
+  offset = offset || 0;
+  const n = new Date();
+  n.setDate(n.getDate() + offset);
+  const pad = function(x) { return String(x).padStart(2,'0'); };
+  return n.getFullYear() + '_' + pad(n.getMonth()+1) + '_' + pad(n.getDate());
+}
+
+function setSyncOk(msg) {
+  document.getElementById('syncDot').className = 'sync-dot';
+  document.getElementById('syncText').textContent = msg;
+}
+
+function init() {
+  // 年セレクト
+  const yearSel = document.getElementById('yearSel');
+  const now = new Date();
+  for (let y = now.getFullYear(); y >= now.getFullYear() - 1; y--) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y + '\u5e74';
+    if (y === now.getFullYear()) opt.selected = true;
+    yearSel.appendChild(opt);
+  }
+  document.getElementById('monthSel').value = String(now.getMonth()+1).padStart(2,'0');
+
+  db.ref('staff').on('value', function(snap) {
+    const val = snap.val();
+    staffList = val ? (Array.isArray(val) ? val : Object.values(val)) : ['\u69ae','\u6c60\u7530','\u85cf\u4e0b','\u5c0f\u6a4b\u5ddd','\u5927\u897f','\u517c\u672c','\u677e\u7530','\u4e88\u5099'];
+    loadGoals();
+  });
+
+  db.ref('report').on('value', function(snap) {
+    reportData = snap.val() || {};
+    generateScript();
+    loadMonthly();
+    setSyncOk('\u540c\u671f\u6e08\u307f');
+  });
+
+  db.ref('goals').on('value', function(snap) {
+    goalData = snap.val() || {};
+    renderGoals();
+  });
+}
+
+// 朝礼スクリプト
+function generateScript() {
+  const key = dateKey(0);
+  const data = (reportData[key]) || {};
+  const now = new Date();
+  const pad = function(x) { return String(x).padStart(2,'0'); };
+  const days = ['\u65e5','\u6708','\u706b','\u6c34','\u6728','\u91d1','\u571f'];
+  const dateStr = now.getFullYear() + '\u5e74' + (now.getMonth()+1) + '\u6708' + now.getDate() + '\u65e5\uff08' + days[now.getDay()] + '\uff09';
+
+  const filtered = staffList.filter(function(n) { return EXCLUDE.indexOf(n) === -1; });
+  let lines = [];
+  let totalMendan = 0, totalAnnai = 0, totalKeiyaku = 0, totalShashin = 0;
+
+  filtered.forEach(function(name) {
+    const d = data[name] || {};
+    const m = d.mendan || 0;
+    const a = d.annai || 0;
+    const k = d.keiyaku || 0;
+    const s = d.shashin || 0;
+    totalMendan += m; totalAnnai += a; totalKeiyaku += k; totalShashin += s;
+    if (m > 0 || a > 0 || k > 0 || s > 0) {
+      let parts = [];
+      if (m > 0) parts.push('\u9762\u8ac7' + m + '\u4ef6');
+      if (a > 0) parts.push('\u6848\u5185' + a + '\u4ef6');
+      if (k > 0) parts.push('\u5951\u7d04' + k + '\u4ef6');
+      if (s > 0) parts.push('\u5199\u771f\u64ae\u308a' + s + '\u4ef6');
+      lines.push('\u300e' + name + '\u300f ' + parts.join('\u3001'));
+    } else {
+      lines.push('\u300e' + name + '\u300f \u4e88\u5b9a\u306a\u3057');
+    }
+  });
+
+  const script =
+    '\u25a0 ' + dateStr + ' \u671d\u793c\n\n' +
+    '\u672c\u65e5\u306e\u4e88\u5b9a\u3092\u78ba\u8a8d\u3057\u307e\u3059\u3002\n\n' +
+    lines.join('\n') + '\n\n' +
+    '\u25a0 \u5408\u8a08\uff1a\u9762\u8ac7' + totalMendan + '\u4ef6\u3001\u6848\u5185' + totalAnnai + '\u4ef6\u3001\u5951\u7d04' + totalKeiyaku + '\u4ef6\u3001\u5199\u771f\u64ae\u308a' + totalShashin + '\u4ef6\n\n' +
+    '\u4ee5\u4e0a\u3001\u672c\u65e5\u3082\u3088\u308d\u3057\u304f\u304a\u9858\u3044\u3057\u307e\u3059\u3002';
+
+  document.getElementById('scriptBox').textContent = script;
+}
+
+function copyScript() {
+  const text = document.getElementById('scriptBox').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '\u2713 \u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f';
+    btn.classList.add('copied');
+    setTimeout(function() {
+      btn.textContent = '\ud83d\udccb \u30b3\u30d4\u30fc\u3059\u308b';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// 月間集計
+function loadMonthly() {
+  const year = document.getElementById('yearSel') ? document.getElementById('yearSel').value : new Date().getFullYear();
+  const month = document.getElementById('monthSel') ? document.getElementById('monthSel').value : String(new Date().getMonth()+1).padStart(2,'0');
+  const prefix = year + '_' + month;
+
+  const filtered = staffList.filter(function(n) { return EXCLUDE.indexOf(n) === -1; });
+  const totals = {};
+  filtered.forEach(function(n) { totals[n] = {mendan:0,annai:0,keiyaku:0,shashin:0}; });
+  const grandTotal = {mendan:0,annai:0,keiyaku:0,shashin:0};
+
+  Object.keys(reportData).forEach(function(key) {
+    if (key.indexOf(prefix) !== 0) return;
+    const dayData = reportData[key];
+    Object.keys(dayData).forEach(function(name) {
+      if (!totals[name]) return;
+      FIELD_KEYS.forEach(function(fkey) {
+        const v = dayData[name][fkey] || 0;
+        totals[name][fkey] += v;
+        grandTotal[fkey] += v;
+      });
+    });
+  });
+
+  const tbody = document.getElementById('monthlyBody');
+  tbody.innerHTML = '';
+
+  filtered.forEach(function(name, idx) {
+    const col = COLORS[idx % COLORS.length];
+    const d = totals[name];
+    const tr = document.createElement('tr');
+    let cells = '<td class="name-col"><span class="staff-badge" style="background:' + col + '22;color:' + col + '"><span class="staff-dot" style="background:' + col + '"></span>' + name + '</span></td>';
+    FIELD_KEYS.forEach(function(fkey, i) {
+      cells += '<td><span class="num-badge ' + BADGE_CLASSES[i] + '">' + d[fkey] + '</span></td>';
+    });
+    tr.innerHTML = cells;
+    tbody.appendChild(tr);
+  });
+
+  const totalTr = document.createElement('tr');
+  totalTr.className = 'total-row';
+  let tc = '<td class="name-col">\u5408\u8a08</td>';
+  FIELD_KEYS.forEach(function(fkey, i) {
+    tc += '<td><span class="num-badge ' + BADGE_CLASSES[i] + '">' + grandTotal[fkey] + '</span></td>';
+  });
+  totalTr.innerHTML = tc;
+  tbody.appendChild(totalTr);
+
+  const total = grandTotal.mendan + grandTotal.annai + grandTotal.keiyaku + grandTotal.shashin;
+  document.getElementById('monthTotal').textContent = '\u8a18\u9332\u65e5\u6570\uff1a' + Object.keys(reportData).filter(function(k){ return k.indexOf(prefix)===0; }).length + '\u65e5';
+}
+
+// 目標設定
+function renderGoals() {
+  const grid = document.getElementById('goalGrid');
+  grid.innerHTML = '';
+  const fields = [
+    {key:'mendan', label:'\u9762\u8ac7', color:'#4f8ef7'},
+    {key:'annai',  label:'\u6848\u5185', color:'#c47eff'},
+    {key:'keiyaku',label:'\u5951\u7d04', color:'#4fd4a8'},
+    {key:'shashin',label:'\u5199\u771f\u64ae\u308a', color:'#f7794f'},
+  ];
+
+  // 今月の合計取得
+  const now = new Date();
+  const prefix = now.getFullYear() + '_' + String(now.getMonth()+1).padStart(2,'0');
+  const monthly = {mendan:0, annai:0, keiyaku:0, shashin:0};
+  Object.keys(reportData).forEach(function(key) {
+    if (key.indexOf(prefix) !== 0) return;
+    const dayData = reportData[key];
+    Object.keys(dayData).forEach(function(name) {
+      FIELD_KEYS.forEach(function(fkey) {
+        monthly[fkey] += dayData[name][fkey] || 0;
+      });
+    });
+  });
+
+  fields.forEach(function(f) {
+    const goal = goalData[f.key] || 0;
+    const current = monthly[f.key] || 0;
+    const pct = goal > 0 ? Math.min(100, Math.round(current / goal * 100)) : 0;
+
+    const card = document.createElement('div');
+    card.className = 'goal-card';
+    card.innerHTML =
+      '<div class="goal-label">' + f.label + '</div>' +
+      '<input class="goal-input" type="number" min="0" id="goal_' + f.key + '" value="' + goal + '" style="border-color:' + f.color + '33">' +
+      '<div class="goal-unit">\u76ee\u6a19\u4ef6\u6570</div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%;background:' + f.color + '"></div></div>' +
+      '<div class="progress-text">' + current + '\u4ef6 / ' + goal + '\u4ef6 (' + pct + '%)</div>';
+    grid.appendChild(card);
+  });
+}
+
+function saveGoals() {
+  const updates = {};
+  FIELD_KEYS.forEach(function(fkey) {
+    const inp = document.getElementById('goal_' + fkey);
+    if (inp) updates[fkey] = parseInt(inp.value) || 0;
+  });
+  db.ref('goals').update(updates).then(function() { setSyncOk('\u76ee\u6a19\u3092\u4fdd\u5b58\u3057\u307e\u3057\u305f \u2713'); });
+}
+
+// 起動時チェック
+if (sessionStorage.getItem('mgr_auth') === '1') {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('mainWrap').style.display = 'block';
+  init();
+}
+</script>
+</body>
+</html>
