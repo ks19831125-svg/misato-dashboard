@@ -224,6 +224,13 @@
   <span id="syncText">接続中...</span>
 </div>
 
+<!-- 担当者選択 -->
+<div class="who-bar" style="background:#fff;border:2px solid #ffd6c8;border-radius:16px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 4px 16px rgba(255,126,179,0.12)">
+  <span style="font-size:11px;color:#6b4f4f;font-weight:700;white-space:nowrap">👤 あなたは？</span>
+  <div id="reportStaffPills" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  <span id="reportMeHint" style="font-size:11px;color:#6b4f4f;margin-left:auto">名前を選んでください</span>
+</div>
+
 <div class="alert-bar hidden" id="alertBar">
   <span class="alert-title">⚠️ 翌日予定未入力：</span>
   <div class="alert-chips" id="alertChips"></div>
@@ -236,8 +243,6 @@
 
 <div class="toolbar">
   <button class="back-link" onclick="goBack()">← ダッシュボードへ</button>
-  <span style="flex:1"></span>
-  <button class="btn primary" onclick="saveAll()">💾 保存</button>
 </div>
 
 <!-- 当日実績 -->
@@ -632,10 +637,39 @@ function updateSubmitUI() {
   });
 }
 
+function renderReportStaff() {
+  const wrap = document.getElementById('reportStaffPills');
+  wrap.innerHTML = '';
+  const me = localStorage.getItem('misato_me');
+  const colors = ['#ff7eb3','#ff9a5c','#5cd4a8','#7eb3ff','#c47eff','#ffcc5c','#ff7070','#a0c4ff'];
+  staffList.forEach((name, idx) => {
+    const col = colors[idx % colors.length];
+    const pill = document.createElement('div');
+    pill.style.cssText = 'padding:5px 14px;border-radius:20px;border:2px solid #ffd6c8;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;color:#6b4f4f;background:#fff8f5;user-select:none';
+    if (me === name) {
+      pill.style.background = 'linear-gradient(135deg,' + col + ',' + col + 'bb)';
+      pill.style.borderColor = col;
+      pill.style.color = '#fff';
+      pill.style.fontWeight = '700';
+    }
+    pill.textContent = name;
+    pill.onclick = () => {
+      localStorage.setItem('misato_me', name);
+      renderReportStaff();
+      updateSubmitUI();
+      updateTodaySubmitUI();
+    };
+    wrap.appendChild(pill);
+  });
+  const hint = document.getElementById('reportMeHint');
+  hint.textContent = me ? me + ' でログイン中 🌸' : '名前を選んでください';
+}
+
 setInterval(checkTimeAlert, 60000);
 initFirebase();
 updateSubmitUI();
 updateTodaySubmitUI();
+renderReportStaff();
 </script>
 </body>
 </html>
