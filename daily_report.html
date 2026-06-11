@@ -7,20 +7,20 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
   :root {
     --bg: #f8f5ff;
     --surface: #ffffff;
     --border: #ddd0ff;
-    --accent: #8b5cf6;
-    --accent2: #a78bfa;
-    --accent3: #5cd4a8;
-    --accent4: #ec4899;
+    --accent: #6d28d9;
+    --accent2: #8b5cf6;
+    --accent3: #059669;
+    --accent4: #db2777;
     --text: #1e1030;
     --text-muted: #6b5a8a;
     --text-dim: #b8a8d8;
-    --shadow: rgba(139,92,246,0.12);
+    --shadow: rgba(109,40,217,0.10);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,155 +30,166 @@
     background-image: radial-gradient(circle at 10% 10%, #ede8ff 0%, transparent 50%),
                       radial-gradient(circle at 90% 90%, #fce8ff 0%, transparent 50%);
     color: var(--text);
-    font-family: 'Noto Sans JP', sans-serif;
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
     min-height: 100vh;
     padding: 20px 24px;
   }
 
   header {
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px; padding-bottom: 14px; border-bottom: 2px dashed var(--border);
+    margin-bottom: 14px; padding-bottom: 14px; border-bottom: 2px solid var(--border);
     position: sticky; top: 0; z-index: 101;
     background: rgba(248,245,255,0.97); backdrop-filter: blur(10px);
   }
   .header-left h1 {
-    font-family: 'Nunito', sans-serif; font-size: 20px; font-weight: 800;
-    background: linear-gradient(135deg, var(--accent), var(--accent4));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 800;
+    color: var(--accent); letter-spacing: -0.02em;
   }
-  .header-left .sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-  #clock { font-family: 'Nunito', sans-serif; font-size: 24px; font-weight: 800; color: var(--accent); text-align:right; }
+  .header-left .sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; letter-spacing: 0.08em; }
+  #clock { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 700; color: var(--accent); text-align:right; }
   #datestr { font-size: 11px; color: var(--text-muted); text-align:right; margin-top: 1px; }
 
+  /* 担当者バー */
   .who-bar {
-    background: rgba(255,255,255,0.97); border: 2px solid var(--border); border-radius: 16px;
-    padding: 12px 16px; margin-bottom: 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 16px; margin-bottom: 10px;
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    box-shadow: 0 4px 16px var(--shadow);
+    box-shadow: 0 2px 8px var(--shadow);
     position: sticky; top: 62px; z-index: 100;
     backdrop-filter: blur(10px);
   }
-  .who-label { font-size: 11px; color: var(--text-muted); font-weight: 700; white-space: nowrap; }
+  .who-label { font-size: 11px; color: var(--text-muted); font-weight: 600; white-space: nowrap; letter-spacing: 0.04em; }
   .staff-pills { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
   .staff-pill {
-    padding: 5px 14px; border-radius: 20px; border: 2px solid var(--border);
-    font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-muted);
+    padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border);
+    font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text-muted);
     background: var(--bg); font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s;
   }
   .staff-pill:hover { border-color: var(--accent); color: var(--accent); }
   .staff-pill.active { color: #fff; font-weight: 700; }
   .me-hint { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
 
+  /* アラート */
   .alert-bar {
-    background: #fff0f0; border: 2px solid #ffc5c5; border-radius: 12px;
-    padding: 10px 16px; margin-bottom: 12px;
+    background: #fff0f0; border: 1px solid #ffc5c5; border-radius: 8px;
+    padding: 8px 14px; margin-bottom: 10px;
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   }
   .alert-bar.hidden { display: none; }
   .time-alert {
-    background: linear-gradient(135deg, #fff3e0, #fff0f0);
-    border: 2px solid #ffaa55; border-radius: 12px;
-    padding: 12px 16px; margin-bottom: 12px;
+    background: #fff8e8; border: 1px solid #ffcc70; border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 10px;
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   }
   .time-alert.hidden { display: none; }
-  .alert-title { font-size: 13px; font-weight: 700; color: #ff5555; }
-  .time-alert-title { font-size: 13px; font-weight: 700; color: #ff7700; }
-  .alert-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .alert-title { font-size: 12px; font-weight: 700; color: #cc3333; }
+  .time-alert-title { font-size: 12px; font-weight: 700; color: #cc7700; }
+  .alert-chips { display: flex; gap: 5px; flex-wrap: wrap; }
   .alert-chip {
-    padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 700;
-    background: #ffe0e0; color: #ff5555; border: 1px solid #ffb5b5;
+    padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    background: #ffe0e0; color: #cc3333; border: 1px solid #ffb5b5;
   }
 
+  /* ツールバー */
   .toolbar { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
   .back-btn {
-    padding: 6px 14px; border-radius: 20px; border: 2px solid var(--border);
+    padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border);
     background: var(--surface); color: var(--text-muted); font-size: 12px; font-weight: 600;
     cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s;
   }
   .back-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-  .sync-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; font-size: 11px; color: var(--text-muted);
-    position: sticky; top: 126px; z-index: 99;
-    background: rgba(248,245,255,0.95); backdrop-filter: blur(8px);
-    padding: 6px 0;
+  .sync-bar {
+    display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+    font-size: 11px; color: var(--text-muted);
+    position: sticky; top: 114px; z-index: 99;
+    background: rgba(248,245,255,0.95); backdrop-filter: blur(8px); padding: 4px 0;
   }
-  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
+  /* セクション */
   .section {
-    background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
-    padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 16px var(--shadow);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px var(--shadow);
   }
   .section-title {
-    font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 800;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
     margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    letter-spacing: -0.01em;
   }
-  .date-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-left: auto; }
+  .date-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-left: auto; }
   .reset-btn-sm {
-    padding: 3px 10px; border-radius: 10px; border: 1px solid var(--border);
-    background: var(--bg); font-size: 11px; font-weight: 600; cursor: pointer;
+    padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border);
+    background: var(--bg); font-size: 10px; font-weight: 600; cursor: pointer;
     font-family: 'Noto Sans JP', sans-serif; color: var(--text-muted); transition: all 0.15s;
   }
-  .reset-btn-sm:hover { border-color: #ff7070; color: #ff7070; }
+  .reset-btn-sm:hover { border-color: #cc3333; color: #cc3333; }
 
+  /* テーブル */
   .table-wrap { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th {
-    background: var(--bg); padding: 8px 12px; text-align: center;
-    font-weight: 700; color: var(--text-muted); border-bottom: 2px solid var(--border); white-space: nowrap;
+    background: var(--bg); padding: 7px 10px; text-align: center;
+    font-weight: 700; color: var(--text-muted); border-bottom: 2px solid var(--border);
+    white-space: nowrap; font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.02em;
   }
   th.name-col { text-align: left; }
-  td { padding: 8px 12px; text-align: center; border-bottom: 1px dashed var(--border); vertical-align: middle; }
-  td.name-col { text-align: left; font-weight: 700; }
+  td { padding: 7px 10px; text-align: center; border-bottom: 1px solid #f0eaff; vertical-align: middle; }
+  td.name-col { text-align: left; font-weight: 600; }
   tr:last-child td { border-bottom: none; }
   tr.total-row td {
-    background: linear-gradient(135deg, #ede8ff, #fce8ff);
+    background: linear-gradient(135deg, #f0ebff, #f8f0ff);
     font-weight: 800; border-top: 2px solid var(--border); color: var(--accent);
+    font-family: 'Inter', sans-serif;
   }
 
   .num-input {
-    width: 52px; padding: 4px 6px; border-radius: 8px;
-    border: 2px solid var(--border); background: var(--bg);
-    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+    width: 50px; padding: 4px; border-radius: 5px;
+    border: 1px solid var(--border); background: var(--bg);
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
     text-align: center; color: var(--text); outline: none; transition: border-color 0.15s;
   }
   .num-input:focus { border-color: var(--accent); }
 
-  .total-badge { display: inline-block; padding: 3px 10px; border-radius: 10px; font-weight: 800; font-size: 14px; }
-  .badge-blue { background: #ede8ff; color: #8b5cf6; }
-  .badge-purple { background: #fce8ff; color: #a855f7; }
-  .badge-green { background: #e8fff8; color: #3a9e7a; }
-  .badge-cyan { background: #fce8f3; color: #ec4899; }
+  .total-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 13px; font-family: 'Inter', sans-serif; }
+  .b1 { background: #ede8ff; color: #6d28d9; }
+  .b2 { background: #f0ecff; color: #7c3aed; }
+  .b3 { background: #d1fae5; color: #065f46; }
+  .b4 { background: #fce7f3; color: #9d174d; }
 
-  .staff-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 10px; font-size: 13px; font-weight: 700; }
-  .staff-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .staff-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+  .staff-dot { width: 7px; height: 7px; border-radius: 50%; }
 
+  /* 提出セクション */
   .submit-section {
-    background: var(--surface); border: 2px solid var(--accent); border-radius: 16px;
-    padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 16px var(--shadow);
+    background: var(--surface); border: 1px solid var(--accent2); border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 14px; box-shadow: 0 2px 8px var(--shadow);
   }
-  .submit-title { font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: var(--accent); margin-bottom: 10px; }
-  .submitted-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; min-height: 28px; align-items: center; }
-  .submitted-chip { padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+  .submit-title {
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
+    color: var(--accent); margin-bottom: 10px; letter-spacing: -0.01em;
+  }
+  .submitted-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; min-height: 26px; align-items: center; }
+  .submitted-chip { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
 
   .submit-btn {
-    padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 700;
+    padding: 7px 18px; border-radius: 6px; font-size: 12px; font-weight: 700;
     border: none; color: #fff; cursor: pointer; font-family: 'Noto Sans JP', sans-serif;
-    transition: all 0.15s;
+    transition: all 0.15s; letter-spacing: 0.02em;
   }
-  .submit-btn.today-btn { background: linear-gradient(135deg, var(--accent), var(--accent4)); box-shadow: 0 3px 10px var(--shadow); }
-  .submit-btn.tomorrow-btn { background: linear-gradient(135deg, var(--accent2), var(--accent)); box-shadow: 0 3px 10px var(--shadow); }
-  .submit-btn.resubmit { background: linear-gradient(135deg, #f0a500, #e07800); box-shadow: 0 3px 10px rgba(240,165,0,0.3); }
+  .submit-btn.today-btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 2px 8px var(--shadow); }
+  .submit-btn.tomorrow-btn { background: linear-gradient(135deg, #0369a1, #0284c7); box-shadow: 0 2px 8px rgba(3,105,161,0.2); }
+  .submit-btn.resubmit { background: linear-gradient(135deg, #d97706, #b45309); }
   .submit-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
-  .submit-note { font-size: 11px; color: var(--text-muted); margin-left: 10px; }
+  .submit-note { font-size: 10px; color: var(--text-muted); margin-left: 8px; }
 </style>
 </head>
 <body>
 
 <header>
   <div class="header-left">
-    <h1>📊 美里店 朝礼・予定管理</h1>
+    <h1>美里店 朝礼・予定管理</h1>
     <div class="sub">MISATO BRANCH · MORNING REPORT</div>
   </div>
   <div>
@@ -188,7 +199,7 @@
 </header>
 
 <div class="who-bar">
-  <span class="who-label">👤 あなたは？</span>
+  <span class="who-label">担当者</span>
   <div class="staff-pills" id="staffPills"></div>
   <span class="me-hint" id="meHint">名前を選んでください</span>
 </div>
@@ -199,25 +210,25 @@
 </div>
 
 <div class="time-alert hidden" id="timeAlert">
-  <span class="time-alert-title">🕕 18:00を過ぎました！翌日予定を提出してから退勤してください</span>
+  <span class="time-alert-title">⚠ 18:00を過ぎました。翌日予定を提出してから退勤してください。</span>
   <div class="alert-chips" id="timeAlertChips"></div>
 </div>
 
 <div class="alert-bar hidden" id="alertBar">
-  <span class="alert-title">⚠️ 翌日予定未提出：</span>
+  <span class="alert-title">未提出：</span>
   <div class="alert-chips" id="alertChips"></div>
 </div>
 
 <div class="toolbar">
-  <button class="back-btn" onclick="window.location.href='index.html'">← ダッシュボードへ</button>
+  <button class="back-btn" onclick="window.location.href='index.html'">← ダッシュボード</button>
 </div>
 
 <!-- 本日予定 -->
 <div class="section">
   <div class="section-title" style="color:var(--accent)">
-    📅 本日予定
+    本日予定
     <span class="date-label" id="todayLabel"></span>
-    <button class="reset-btn-sm" onclick="resetTable('today')">🔄 リセット</button>
+    <button class="reset-btn-sm" onclick="resetTable('today')">リセット</button>
   </div>
   <div class="table-wrap">
     <table>
@@ -233,20 +244,20 @@
 </div>
 
 <div class="submit-section">
-  <div class="submit-title">✅ 本日予定 提出状況</div>
+  <div class="submit-title">本日予定 提出状況</div>
   <div class="submitted-chips" id="todaySubmittedChips">
-    <span style="color:var(--text-dim);font-size:12px">まだ誰も提出していません</span>
+    <span style="color:var(--text-dim);font-size:11px">未提出</span>
   </div>
-  <button class="submit-btn today-btn" id="todaySubmitBtn" onclick="submitToday()">📤 本日予定を提出する</button>
+  <button class="submit-btn today-btn" id="todaySubmitBtn" onclick="submitToday()">本日予定を提出</button>
   <span class="submit-note">※0件・修正後も押してください</span>
 </div>
 
 <!-- 翌日予定 -->
 <div class="section">
-  <div class="section-title" style="color:var(--accent2)">
-    📆 翌日予定
+  <div class="section-title" style="color:#0369a1">
+    翌日予定
     <span class="date-label" id="tomorrowLabel"></span>
-    <button class="reset-btn-sm" onclick="resetTable('tomorrow')">🔄 リセット</button>
+    <button class="reset-btn-sm" onclick="resetTable('tomorrow')">リセット</button>
   </div>
   <div class="table-wrap">
     <table>
@@ -261,12 +272,12 @@
   </div>
 </div>
 
-<div class="submit-section">
-  <div class="submit-title">✅ 翌日予定 提出状況</div>
+<div class="submit-section" style="border-color:#0369a1">
+  <div class="submit-title" style="color:#0369a1">翌日予定 提出状況</div>
   <div class="submitted-chips" id="tomorrowSubmittedChips">
-    <span style="color:var(--text-dim);font-size:12px">まだ誰も提出していません</span>
+    <span style="color:var(--text-dim);font-size:11px">未提出</span>
   </div>
-  <button class="submit-btn tomorrow-btn" id="tomorrowSubmitBtn" onclick="submitTomorrow()">📤 翌日予定を提出する</button>
+  <button class="submit-btn tomorrow-btn" id="tomorrowSubmitBtn" onclick="submitTomorrow()">翌日予定を提出</button>
   <span class="submit-note">※0件・修正後も押してください</span>
 </div>
 
@@ -275,9 +286,9 @@ const firebaseConfig = { databaseURL: "https://misato-dashboard-default-rtdb.fir
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const COLORS = ['#4a7fff','#7eb3ff','#5cd4a8','#a78bfa','#f59e0b','#06b6d4','#10b981','#8b5cf6'];
+const COLORS = ['#6d28d9','#0369a1','#059669','#db2777','#d97706','#0891b2','#7c3aed','#be185d'];
 const FIELD_KEYS = ['mendan','annai','keiyaku','shashin'];
-const BADGE_CLASSES = ['badge-blue','badge-purple','badge-green','badge-cyan'];
+const BADGE_CLASSES = ['b1','b2','b3','b4'];
 const EXCLUDE = ['\u69ae','\u677e\u7530'];
 
 let staffList = [];
@@ -322,7 +333,7 @@ function renderStaff() {
     btn.className = 'staff-pill' + (currentUser === name ? ' active' : '');
     btn.textContent = name;
     if (currentUser === name) {
-      btn.style.background = 'linear-gradient(135deg,' + col + ',' + col + 'bb)';
+      btn.style.background = col;
       btn.style.borderColor = col;
       btn.style.color = '#fff';
     }
@@ -336,7 +347,7 @@ function renderStaff() {
     wrap.appendChild(btn);
   });
   document.getElementById('meHint').textContent =
-    currentUser ? currentUser + ' \u3067\u30ed\u30b0\u30a4\u30f3\u4e2d \ud83c\udf38' : '\u540d\u524d\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044';
+    currentUser ? currentUser + ' \u30ed\u30b0\u30a4\u30f3\u4e2d' : '\u540d\u524d\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044';
 }
 
 function setSyncOk(msg) {
@@ -344,7 +355,25 @@ function setSyncOk(msg) {
   document.getElementById('syncText').textContent = msg;
 }
 
+// 日付変更チェック・自動リセット
+function checkDateChange() {
+  const lastDate = localStorage.getItem('report_last_date');
+  const today = dateKey(0);
+  if (lastDate && lastDate !== today) {
+    // 日付が変わった → 提出状況をリセット
+    const updates = {};
+    updates['submitted_today/' + lastDate] = null;
+    updates['submitted/' + lastDate] = null;
+    // 翌日予定データもリセット
+    updates['report/' + today] = null;
+    db.ref().update(updates);
+  }
+  localStorage.setItem('report_last_date', today);
+}
+
 function init() {
+  checkDateChange();
+
   db.ref('staff').on('value', function(snap) {
     const val = snap.val();
     staffList = val ? (Array.isArray(val) ? val : Object.values(val)) : ['\u69ae','\u6c60\u7530','\u85cf\u4e0b','\u5c0f\u6a4b\u5ddd','\u5927\u897f','\u517c\u672c','\u677e\u7530','\u4e88\u5099'];
@@ -354,7 +383,7 @@ function init() {
   db.ref('report').on('value', function(snap) {
     reportData = snap.val() || {};
 
-    // 自動引き継ぎ
+    // 自動引き継ぎ（本日データが空なら昨日の翌日予定をコピー）
     const todayKey_ = dateKey(0);
     const yestKey = dateKey(-1);
     const todayData = reportData[todayKey_];
@@ -362,6 +391,7 @@ function init() {
     const todayHasData = todayData && Object.values(todayData).some(function(s) {
       return s && Object.values(s).some(function(v) { return v > 0; });
     });
+
     if (!todayHasData && yestData) {
       const updates = {};
       Object.keys(yestData).forEach(function(name) {
@@ -374,7 +404,7 @@ function init() {
       });
       if (Object.keys(updates).length > 0) {
         db.ref().update(updates);
-        setSyncOk('\u6628\u65e5\u306e\u7fcc\u65e5\u4e88\u5b9a\u3092\u672c\u65e5\u4e88\u5b9a\u306b\u81ea\u52d5\u5f15\u304d\u7d99\u304e\u3057\u307e\u3057\u305f \u2713');
+        setSyncOk('\u6628\u65e5\u306e\u7fcc\u65e5\u4e88\u5b9a\u3092\u672c\u65e5\u306b\u81ea\u52d5\u5f15\u304d\u7d99\u304e\u3057\u307e\u3057\u305f');
         return;
       }
     }
@@ -394,14 +424,14 @@ function init() {
 function renderTable(tbodyId, key) {
   const tbody = document.getElementById(tbodyId);
   tbody.innerHTML = '';
-  const totals = {mendan:0, annai:0, keiyaku:0, shashin:0};
+  const totals = {mendan:0,annai:0,keiyaku:0,shashin:0};
   const filtered = staffList.filter(function(n) { return EXCLUDE.indexOf(n) === -1; });
 
   filtered.forEach(function(name, idx) {
     const col = COLORS[idx % COLORS.length];
     const data = (reportData[key] && reportData[key][name]) || {};
     const tr = document.createElement('tr');
-    let cells = '<td class="name-col"><span class="staff-badge" style="background:' + col + '22;color:' + col + '"><span class="staff-dot" style="background:' + col + '"></span>' + name + '</span></td>';
+    let cells = '<td class="name-col"><span class="staff-badge" style="background:' + col + '18;color:' + col + '"><span class="staff-dot" style="background:' + col + '"></span>' + name + '</span></td>';
     FIELD_KEYS.forEach(function(fkey) {
       const val = data[fkey] || 0;
       totals[fkey] += val;
@@ -413,11 +443,11 @@ function renderTable(tbodyId, key) {
 
   const totalTr = document.createElement('tr');
   totalTr.className = 'total-row';
-  let totalCells = '<td class="name-col">\u5408\u8a08</td>';
+  let tc = '<td class="name-col">\u5408\u8a08</td>';
   FIELD_KEYS.forEach(function(fkey, i) {
-    totalCells += '<td><span class="total-badge ' + BADGE_CLASSES[i] + '" id="total_' + tbodyId + '_' + fkey + '">' + totals[fkey] + '</span></td>';
+    tc += '<td><span class="total-badge ' + BADGE_CLASSES[i] + '" id="total_' + tbodyId + '_' + fkey + '">' + totals[fkey] + '</span></td>';
   });
-  totalTr.innerHTML = totalCells;
+  totalTr.innerHTML = tc;
   tbody.appendChild(totalTr);
 }
 
@@ -452,19 +482,19 @@ function resetTable(which) {
 }
 
 function submitToday() {
-  if (!currentUser) { alert('\u307e\u305a\u540d\u524d\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044'); return; }
-  if (EXCLUDE.indexOf(currentUser) >= 0) { alert('\u3053\u306e\u62c5\u5f53\u8005\u306f\u4e88\u5b9a\u7ba1\u7406\u5bfe\u8c61\u5916\u3067\u3059'); return; }
+  if (!currentUser) { alert('\u540d\u524d\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044'); return; }
+  if (EXCLUDE.indexOf(currentUser) >= 0) { alert('\u5bfe\u8c61\u5916\u3067\u3059'); return; }
   db.ref('submitted_today/' + dateKey(0) + '/' + currentUser).set(true);
 }
 
 function submitTomorrow() {
-  if (!currentUser) { alert('\u307e\u305a\u540d\u524d\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044'); return; }
-  if (EXCLUDE.indexOf(currentUser) >= 0) { alert('\u3053\u306e\u62c5\u5f53\u8005\u306f\u4e88\u5b9a\u7ba1\u7406\u5bfe\u8c61\u5916\u3067\u3059'); return; }
+  if (!currentUser) { alert('\u540d\u524d\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044'); return; }
+  if (EXCLUDE.indexOf(currentUser) >= 0) { alert('\u5bfe\u8c61\u5916\u3067\u3059'); return; }
   db.ref('submitted/' + dateKey(1) + '/' + currentUser).set(true);
 }
 
 function resubmit(which) {
-  if (!currentUser) { alert('\u307e\u305a\u540d\u524d\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044'); return; }
+  if (!currentUser) { alert('\u540d\u524d\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044'); return; }
   const key = which === 'today' ? dateKey(0) : dateKey(1);
   const dbKey = which === 'today' ? 'submitted_today' : 'submitted';
   db.ref(dbKey + '/' + key + '/' + currentUser).remove();
@@ -475,7 +505,7 @@ function updateSubmitUI(which) {
   const dbKey = which === 'today' ? 'submitted_today' : 'submitted';
   const chipsId = which === 'today' ? 'todaySubmittedChips' : 'tomorrowSubmittedChips';
   const btnId = which === 'today' ? 'todaySubmitBtn' : 'tomorrowSubmitBtn';
-  const btnLabel = which === 'today' ? '\ud83d\udce4 \u672c\u65e5\u4e88\u5b9a\u3092\u63d0\u51fa\u3059\u308b' : '\ud83d\udce4 \u7fcc\u65e5\u4e88\u5b9a\u3092\u63d0\u51fa\u3059\u308b';
+  const btnLabel = which === 'today' ? '\u672c\u65e5\u4e88\u5b9a\u3092\u63d0\u51fa' : '\u7fcc\u65e5\u4e88\u5b9a\u3092\u63d0\u51fa';
 
   db.ref(dbKey + '/' + key).on('value', function(snap) {
     const data = snap.val() || {};
@@ -487,23 +517,20 @@ function updateSubmitUI(which) {
     if (submitted.length > 0) {
       chips.innerHTML = submitted.map(function(n, i) {
         const col = COLORS[i % COLORS.length];
-        return '<span class="submitted-chip" style="background:' + col + '22;color:' + col + ';border:1px solid ' + col + '">' + n + ' \u2713</span>';
+        return '<span class="submitted-chip" style="background:' + col + '18;color:' + col + ';border:1px solid ' + col + '44">' + n + ' ✓</span>';
       }).join('');
     } else {
-      chips.innerHTML = '<span style="color:var(--text-dim);font-size:12px">\u307e\u3060\u8ab0\u3082\u63d0\u51fa\u3057\u3066\u3044\u307e\u305b\u3093</span>';
+      chips.innerHTML = '<span style="color:var(--text-dim);font-size:11px">\u672a\u63d0\u51fa</span>';
     }
 
     if (currentUser && submitted.indexOf(currentUser) >= 0) {
-      // 提出済み → 再提出ボタン表示
-      btn.textContent = '\ud83d\udd04 \u518d\u63d0\u51fa\u3059\u308b';
+      btn.textContent = '\u518d\u63d0\u51fa\u3059\u308b';
       btn.className = 'submit-btn resubmit';
       btn.onclick = function() { resubmit(which); };
-      btn.disabled = false;
     } else {
       btn.textContent = btnLabel;
       btn.className = 'submit-btn ' + (which === 'today' ? 'today-btn' : 'tomorrow-btn');
       btn.onclick = which === 'today' ? submitToday : submitTomorrow;
-      btn.disabled = false;
     }
 
     if (which === 'tomorrow') {
@@ -530,10 +557,7 @@ function updateSubmitUI(which) {
   });
 }
 
-function checkTimeAlert() {
-  updateSubmitUI('tomorrow');
-}
-
+function checkTimeAlert() { updateSubmitUI('tomorrow'); }
 setInterval(function() { checkTimeAlert(); }, 60000);
 init();
 </script>
