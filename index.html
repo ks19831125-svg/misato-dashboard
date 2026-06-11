@@ -255,6 +255,63 @@
     display: flex; gap: 14px; flex-wrap: wrap; margin-top: 18px;
     padding-top: 14px; border-top: 2px dashed var(--border);
   }
+
+  /* 今日の一言 */
+  .daily-msg {
+    background: linear-gradient(135deg, #fff0f8, #f8f0ff);
+    border: 2px solid var(--border); border-radius: 16px;
+    padding: 14px 18px; margin-bottom: 14px;
+    box-shadow: 0 4px 16px var(--shadow);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .daily-msg-icon { font-size: 24px; flex-shrink: 0; }
+  .daily-msg-text { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.6; flex: 1; }
+  .daily-msg-author { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+  .daily-msg-refresh {
+    padding: 4px 10px; border-radius: 20px; border: 2px solid var(--border);
+    background: var(--surface); color: var(--text-muted); font-size: 11px; font-weight: 600;
+    cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s; flex-shrink: 0;
+  }
+  .daily-msg-refresh:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* お知らせ掲示板 */
+  .notice-board {
+    background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
+    padding: 16px; margin-bottom: 14px; box-shadow: 0 4px 16px var(--shadow);
+  }
+  .notice-title {
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800;
+    color: var(--accent2); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .notice-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; min-height: 40px; }
+  .notice-item {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; display: flex; align-items: flex-start; gap: 10px;
+  }
+  .notice-item-info { flex: 1; }
+  .notice-item-name { font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 3px; }
+  .notice-item-text { font-size: 13px; color: var(--text); line-height: 1.5; word-break: break-all; }
+  .notice-item-time { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+  .notice-del-btn {
+    width: 22px; height: 22px; border-radius: 50%; background: #fff0f0;
+    border: 1px solid #ffc5c5; color: #ff7070; font-size: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .notice-input-row { display: flex; gap: 8px; align-items: flex-end; }
+  .notice-input {
+    flex: 1; padding: 8px 12px; border-radius: 10px; border: 2px solid var(--border);
+    background: var(--bg); font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
+    outline: none; color: var(--text); resize: none; min-height: 40px;
+  }
+  .notice-input:focus { border-color: var(--accent); }
+  .notice-post-btn {
+    padding: 8px 16px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; font-size: 12px; font-weight: 700; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; white-space: nowrap; transition: all 0.15s;
+  }
+  .notice-post-btn:hover { opacity: 0.88; }
+  .notice-empty { font-size: 12px; color: var(--text-dim); text-align: center; padding: 12px; }
   .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); font-weight: 600; }
 </style>
 </head>
@@ -289,6 +346,28 @@
   <button class="btn green" onclick="openCatModal()">📂 カテゴリ</button>
   <button class="btn" id="editBtn" onclick="toggleEdit()">✏️ 編集</button>
   <button class="btn primary" id="saveBtn" onclick="saveAll()" style="display:none">💾 保存</button>
+</div>
+
+<!-- 今日の一言 -->
+<div class="daily-msg" id="dailyMsg">
+  <div class="daily-msg-icon">💬</div>
+  <div style="flex:1">
+    <div class="daily-msg-text" id="dailyMsgText">読み込み中...</div>
+    <div class="daily-msg-author" id="dailyMsgAuthor"></div>
+  </div>
+  <button class="daily-msg-refresh" onclick="refreshMessage()">🔄</button>
+</div>
+
+<!-- お知らせ掲示板 -->
+<div class="notice-board">
+  <div class="notice-title">📌 お知らせ掲示板</div>
+  <div class="notice-list" id="noticeList">
+    <div class="notice-empty">お知らせはありません</div>
+  </div>
+  <div class="notice-input-row">
+    <textarea class="notice-input" id="noticeInput" placeholder="お知らせを入力..." rows="2"></textarea>
+    <button class="notice-post-btn" onclick="postNotice()">投稿</button>
+  </div>
 </div>
 
 <div id="sectionsWrap"></div>
