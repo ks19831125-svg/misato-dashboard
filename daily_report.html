@@ -214,8 +214,13 @@
   <div class="alert-chips" id="timeAlertChips"></div>
 </div>
 
-<div class="alert-bar hidden" id="alertBar">
-  <span class="alert-title">未提出：</span>
+<div class="alert-bar hidden" id="todayAlertBar">
+  <span class="alert-title">本日予定 未提出：</span>
+  <div class="alert-chips" id="todayAlertChips"></div>
+</div>
+
+<div class="alert-bar hidden" id="alertBar" style="border-color:#ffaa55;background:#fff8e8">
+  <span class="alert-title" style="color:#cc7700">翌日予定 未提出：</span>
   <div class="alert-chips" id="alertChips"></div>
 </div>
 
@@ -533,14 +538,26 @@ function updateSubmitUI(which) {
       btn.onclick = which === 'today' ? submitToday : submitTomorrow;
     }
 
+    const filtered = staffList.filter(function(n) { return EXCLUDE.indexOf(n) === -1; });
+    const unsubmitted = filtered.filter(function(n) { return submitted.indexOf(n) === -1; });
+
+    if (which === 'today') {
+      const todayAlertBar = document.getElementById('todayAlertBar');
+      const todayAlertChips = document.getElementById('todayAlertChips');
+      if (unsubmitted.length > 0) {
+        todayAlertBar.classList.remove('hidden');
+        todayAlertChips.innerHTML = unsubmitted.map(function(n) { return '<span class="alert-chip">' + n + '</span>'; }).join('');
+      } else {
+        todayAlertBar.classList.add('hidden');
+      }
+    }
+
     if (which === 'tomorrow') {
-      const filtered = staffList.filter(function(n) { return EXCLUDE.indexOf(n) === -1; });
-      const unsubmitted = filtered.filter(function(n) { return submitted.indexOf(n) === -1; });
       const alertBar = document.getElementById('alertBar');
       const alertChips = document.getElementById('alertChips');
       if (unsubmitted.length > 0) {
         alertBar.classList.remove('hidden');
-        alertChips.innerHTML = unsubmitted.map(function(n) { return '<span class="alert-chip">' + n + '</span>'; }).join('');
+        alertChips.innerHTML = unsubmitted.map(function(n) { return '<span class="alert-chip" style="background:#fff0d0;color:#cc7700;border-color:#ffcc70">' + n + '</span>'; }).join('');
       } else {
         alertBar.classList.add('hidden');
       }
