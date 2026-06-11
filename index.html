@@ -965,7 +965,7 @@ function initNoticeBoard() {
         '<div class="notice-item-text">' + (d.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' +
         '<div class="notice-item-time">' + timeStr + '</div>' +
         '</div>' +
-        '<button class="notice-del-btn" onclick="deleteNotice('' + key + '')">✕</button>';
+        '<button class="notice-del-btn" onclick="deleteNotice(\'' + key + '\')">✕</button>';
       list.appendChild(item);
     });
   });
