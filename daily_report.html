@@ -298,6 +298,7 @@ const EXCLUDE = ['\u69ae','\u677e\u7530'];
 
 let staffList = [];
 let reportData = {};
+let reportTomorrowData = {};
 let currentUser = localStorage.getItem('misato_me') || '';
 
 function updateClock() {
@@ -365,12 +366,9 @@ function checkDateChange() {
   const lastDate = localStorage.getItem('report_last_date');
   const today = dateKey(0);
   if (lastDate && lastDate !== today) {
-    // 日付が変わった → 提出状況をリセット
     const updates = {};
     updates['submitted_today/' + lastDate] = null;
     updates['submitted/' + lastDate] = null;
-    // 翌日予定データもリセット
-    updates['report/' + today] = null;
     db.ref().update(updates);
   }
   localStorage.setItem('report_last_date', today);
@@ -383,6 +381,10 @@ function init() {
     const val = snap.val();
     staffList = val ? (Array.isArray(val) ? val : Object.values(val)) : ['\u69ae','\u6c60\u7530','\u85cf\u4e0b','\u5c0f\u6a4b\u5ddd','\u5927\u897f','\u517c\u672c','\u677e\u7530','\u4e88\u5099'];
     renderStaff();
+  });
+
+  db.ref('report_tomorrow').on('value', function(snap) {
+    reportTomorrowData = snap.val() || {};
   });
 
   db.ref('report').on('value', function(snap) {
@@ -414,8 +416,8 @@ function init() {
       }
     }
 
-    renderTable('todayBody', dateKey(0));
-    renderTable('tomorrowBody', dateKey(1));
+    renderTable('todayBody', dateKey(0), 'report');
+    renderTable('tomorrowBody', dateKey(0), 'report_tomorrow');
     document.getElementById('todayLabel').textContent = dateLabel(0);
     document.getElementById('tomorrowLabel').textContent = dateLabel(1);
     setSyncOk('\u540c\u671f\u6e08\u307f');
@@ -426,7 +428,8 @@ function init() {
   updateSubmitUI('tomorrow');
 }
 
-function renderTable(tbodyId, key) {
+function renderTable(tbodyId, key, tableName) {
+  tableName = tableName || 'report';
   const tbody = document.getElementById(tbodyId);
   tbody.innerHTML = '';
   const totals = {mendan:0,annai:0,keiyaku:0,shashin:0};
@@ -434,13 +437,14 @@ function renderTable(tbodyId, key) {
 
   filtered.forEach(function(name, idx) {
     const col = COLORS[idx % COLORS.length];
-    const data = (reportData[key] && reportData[key][name]) || {};
+    const tableData = tableName === 'report' ? reportData : reportTomorrowData;
+    const data = (tableData[key] && tableData[key][name]) || {};
     const tr = document.createElement('tr');
     let cells = '<td class="name-col"><span class="staff-badge" style="background:' + col + '18;color:' + col + '"><span class="staff-dot" style="background:' + col + '"></span>' + name + '</span></td>';
     FIELD_KEYS.forEach(function(fkey) {
       const val = data[fkey] || 0;
       totals[fkey] += val;
-      cells += '<td><input class="num-input" type="number" min="0" value="' + val + '" data-key="' + key + '" data-name="' + name + '" data-field="' + fkey + '" data-tbody="' + tbodyId + '" onchange="updateValue(this)"></td>';
+      cells += '<td><input class="num-input" type="number" min="0" value="' + val + '" data-key="' + key + '" data-name="' + name + '" data-field="' + fkey + '" data-tbody="' + tbodyId + '" data-table="' + tableName + '" onchange="updateValue(this)"></td>';
     });
     tr.innerHTML = cells;
     tbody.appendChild(tr);
@@ -461,8 +465,9 @@ function updateValue(input) {
   const name = input.dataset.name;
   const field = input.dataset.field;
   const tbodyId = input.dataset.tbody;
+  const tableName = input.dataset.table || 'report';
   const val = parseInt(input.value) || 0;
-  db.ref('report/' + key + '/' + name + '/' + field).set(val);
+  db.ref(tableName + '/' + key + '/' + name + '/' + field).set(val);
   const inputs = document.querySelectorAll('#' + tbodyId + ' input[data-field="' + field + '"]');
   let total = 0;
   inputs.forEach(function(inp) { total += parseInt(inp.value) || 0; });
