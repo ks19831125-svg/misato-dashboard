@@ -10,25 +10,25 @@
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
   :root {
-    --bg: #f8f5ff;
+    --bg: #fff5f5;
     --surface: #ffffff;
-    --border: #ddd0ff;
-    --accent: #6d28d9;
-    --accent2: #8b5cf6;
+    --border: #ffd0d0;
+    --accent: #e60012;
+    --accent2: #ff5252;
     --accent3: #059669;
-    --accent4: #db2777;
-    --text: #1e1030;
-    --text-muted: #6b5a8a;
-    --text-dim: #b8a8d8;
-    --shadow: rgba(109,40,217,0.10);
+    --accent4: #ff8c42;
+    --text: #2a1414;
+    --text-muted: #8a6060;
+    --text-dim: #d8b8b8;
+    --shadow: rgba(230,0,18,0.08);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     background: var(--bg);
-    background-image: radial-gradient(circle at 10% 10%, #ede8ff 0%, transparent 50%),
-                      radial-gradient(circle at 90% 90%, #fce8ff 0%, transparent 50%);
+    background-image: radial-gradient(circle at 10% 10%, #ffe8e8 0%, transparent 50%),
+                      radial-gradient(circle at 90% 90%, #fff0e8 0%, transparent 50%);
     color: var(--text);
     font-family: 'Noto Sans JP', 'Inter', sans-serif;
     min-height: 100vh;
@@ -39,7 +39,7 @@
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 14px; padding-bottom: 14px; border-bottom: 2px solid var(--border);
     position: sticky; top: 0; z-index: 101;
-    background: rgba(248,245,255,0.97); backdrop-filter: blur(10px);
+    background: rgba(255,245,245,0.97); backdrop-filter: blur(10px);
   }
   .header-left h1 {
     font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 800;
@@ -103,7 +103,7 @@
     display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
     font-size: 11px; color: var(--text-muted);
     position: sticky; top: 114px; z-index: 99;
-    background: rgba(248,245,255,0.95); backdrop-filter: blur(8px); padding: 4px 0;
+    background: rgba(255,245,245,0.95); backdrop-filter: blur(8px); padding: 4px 0;
   }
   .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
@@ -139,7 +139,7 @@
   td.name-col { text-align: left; font-weight: 600; }
   tr:last-child td { border-bottom: none; }
   tr.total-row td {
-    background: linear-gradient(135deg, #f0ebff, #f8f0ff);
+    background: linear-gradient(135deg, #ffe8e8, #fff0e8);
     font-weight: 800; border-top: 2px solid var(--border); color: var(--accent);
     font-family: 'Inter', sans-serif;
   }
@@ -153,10 +153,10 @@
   .num-input:focus { border-color: var(--accent); }
 
   .total-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 13px; font-family: 'Inter', sans-serif; }
-  .b1 { background: #ede8ff; color: #6d28d9; }
-  .b2 { background: #f0ecff; color: #7c3aed; }
+  .b1 { background: #ffe8e8; color: #e60012; }
+  .b2 { background: #fff0e8; color: #ff5252; }
   .b3 { background: #d1fae5; color: #065f46; }
-  .b4 { background: #fce7f3; color: #9d174d; }
+  .b4 { background: #ffe0f0; color: #c2185b; }
 
   .staff-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
   .staff-dot { width: 7px; height: 7px; border-radius: 50%; }
@@ -179,7 +179,7 @@
     transition: all 0.15s; letter-spacing: 0.02em;
   }
   .submit-btn.today-btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 2px 8px var(--shadow); }
-  .submit-btn.tomorrow-btn { background: linear-gradient(135deg, #0369a1, #0284c7); box-shadow: 0 2px 8px rgba(3,105,161,0.2); }
+  .submit-btn.tomorrow-btn { background: linear-gradient(135deg, #ff5252, #0284c7); box-shadow: 0 2px 8px rgba(255,82,82,0.15); }
   .submit-btn.resubmit { background: linear-gradient(135deg, #d97706, #b45309); }
   .submit-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
   .submit-note { font-size: 10px; color: var(--text-muted); margin-left: 8px; }
@@ -259,7 +259,7 @@
 
 <!-- 翌日予定 -->
 <div class="section">
-  <div class="section-title" style="color:#0369a1">
+  <div class="section-title" style="color:#ff5252">
     翌日予定
     <span class="date-label" id="tomorrowLabel"></span>
     <button class="reset-btn-sm" onclick="resetTable('tomorrow')">リセット</button>
@@ -277,8 +277,8 @@
   </div>
 </div>
 
-<div class="submit-section" style="border-color:#0369a1">
-  <div class="submit-title" style="color:#0369a1">翌日予定 提出状況</div>
+<div class="submit-section" style="border-color:#ff5252">
+  <div class="submit-title" style="color:#ff5252">翌日予定 提出状況</div>
   <div class="submitted-chips" id="tomorrowSubmittedChips">
     <span style="color:var(--text-dim);font-size:11px">未提出</span>
   </div>
@@ -291,7 +291,7 @@ const firebaseConfig = { databaseURL: "https://misato-dashboard-default-rtdb.fir
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const COLORS = ['#6d28d9','#0369a1','#059669','#db2777','#d97706','#0891b2','#7c3aed','#be185d'];
+const COLORS = ['#6d28d9','#ff5252','#059669','#db2777','#d97706','#0891b2','#7c3aed','#be185d'];
 const FIELD_KEYS = ['mendan','annai','keiyaku','shashin'];
 const BADGE_CLASSES = ['b1','b2','b3','b4'];
 const EXCLUDE = ['\u69ae','\u677e\u7530'];
