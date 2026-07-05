@@ -442,56 +442,35 @@ function checkDateChange() {
 }
 
 // 初期化
+function renderAll() {
+  renderTable('todayBody', dateKey(0));
+  renderTable('tomorrowBody', dateKey(1));
+  document.getElementById('todayLabel').textContent = dateLabel(0);
+  document.getElementById('tomorrowLabel').textContent = dateLabel(1);
+  setSyncOk('同期済み');
+  checkTimeAlert();
+}
+
 function init() {
   checkDateChange();
+
+  // staffとreportを両方読んでから描画する
+  var staffLoaded = false;
+  var reportLoaded = false;
 
   db.ref('staff').on('value', function(snap) {
     const val = snap.val();
     staffList = val ? (Array.isArray(val) ? val : Object.values(val))
-      : ['\u69ae','\u6c60\u7530','\u85cf\u4e0b','\u5c0f\u6a4b\u5ddd','\u5927\u897f','\u517c\u672c','\u677e\u7530','\u4e88\u5099'];
+      : ['榮','池田','藏下','小橋川','大西','兼本','松田','予備'];
+    staffLoaded = true;
     renderStaff();
-  });
-
-  db.ref('report_tomorrow').on('value', function(snap) {
-    reportTomorrowData = snap.val() || {};
-    renderTable('tomorrowBody', dateKey(0), 'report_tomorrow');
-    document.getElementById('tomorrowLabel').textContent = dateLabel(1);
+    if (reportLoaded) renderAll();
   });
 
   db.ref('report').on('value', function(snap) {
     reportData = snap.val() || {};
-
-    const todayKey_ = dateKey(0);
-    const yestKey = dateKey(-1);
-    const todayData = reportData[todayKey_];
-    const todayHasData = todayData && Object.values(todayData).some(function(s) {
-      return s && Object.values(s).some(function(v) { return v > 0; });
-    });
-
-    if (!todayHasData) {
-      db.ref('report_tomorrow/' + yestKey).once('value').then(function(snap2) {
-        const yestTomorrow = snap2.val();
-        if (yestTomorrow && Object.keys(yestTomorrow).length > 0) {
-          const updates = {};
-          Object.keys(yestTomorrow).forEach(function(name) {
-            const fields = yestTomorrow[name];
-            if (fields) {
-              Object.keys(fields).forEach(function(fkey) {
-                updates['report/' + todayKey_ + '/' + name + '/' + fkey] = fields[fkey];
-              });
-            }
-          });
-          db.ref().update(updates).then(function() {
-            setSyncOk('\u6628\u65e5\u306e\u7fcc\u65e5\u4e88\u5b9a\u3092\u672c\u65e5\u306b\u81ea\u52d5\u5f15\u304d\u7d99\u304e\u3057\u307e\u3057\u305f');
-          });
-        }
-      });
-    }
-
-    renderTable('todayBody', todayKey_, 'report');
-    document.getElementById('todayLabel').textContent = dateLabel(0);
-    setSyncOk('\u540c\u671f\u6e08\u307f');
-    checkTimeAlert();
+    reportLoaded = true;
+    if (staffLoaded) renderAll();
   });
 
   updateSubmitUI('today');
@@ -499,7 +478,7 @@ function init() {
 }
 
 // テーブル描画
-function renderTable(tbodyId, key, tableName) {
+function renderTable(tbodyId, key) {
   const tbody = document.getElementById(tbodyId);
   if (!tbody) return;
   tbody.innerHTML = '';
