@@ -10,35 +10,47 @@
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap');
 
   :root {
-    --bg: #fff8f5;
+    --bg: #f0f4fa;
     --surface: #ffffff;
-    --border: #ffd6c8;
-    --accent: #ff7eb3;
-    --accent2: #ff9a5c;
-    --accent3: #5cd4a8;
-    --text: #1a1010;
-    --text-muted: #6b4f4f;
-    --text-dim: #9a7a7a;
-    --shadow: rgba(255,126,179,0.12);
+    --border: #c5d5f0;
+    --accent: #0a2472;
+    --accent2: #1a5fb4;
+    --accent3: #d4af37;
+    --text: #0a1428;
+    --text-muted: #4a5a7a;
+    --text-dim: #a0b0d0;
+    --shadow: rgba(10,36,114,0.12);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     background: var(--bg);
-    background-image: radial-gradient(circle at 10% 10%, #ffe8f5 0%, transparent 50%),
-                      radial-gradient(circle at 90% 90%, #e8f0ff 0%, transparent 50%);
+    background-image: radial-gradient(circle at 10% 10%, #e8eeff 0%, transparent 50%),
+                      radial-gradient(circle at 90% 90%, #fff8e0 0%, transparent 50%),
+                      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><g fill="none" stroke="%230a2472" stroke-opacity="0.035" stroke-width="1.5"><circle cx="40" cy="40" r="16"/><path d="M40 24 L52 33 L47 48 L33 48 L28 33 Z"/><path d="M40 24 L40 12"/><path d="M52 33 L64 30"/><path d="M47 48 L54 58"/><path d="M33 48 L26 58"/><path d="M28 33 L16 30"/></g></svg>');
+    background-size: auto, auto, 80px 80px;
     color: var(--text);
     font-family: 'Noto Sans JP', sans-serif;
     min-height: 100vh;
     padding: 20px 24px;
   }
 
+  .trophy-banner {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 14px; padding: 10px 16px; margin-bottom: 14px;
+    box-shadow: 0 4px 16px var(--shadow);
+    color: #fff; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+  .trophy-banner .gold-text { color: var(--accent3); }
+
   header {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 18px; padding-bottom: 14px; border-bottom: 2px dashed var(--border);
     position: sticky; top: 0; z-index: 101;
-    background: rgba(255,248,245,0.97);
+    background: rgba(240,244,250,0.97);
     backdrop-filter: blur(10px);
   }
   .header-left h1 {
@@ -79,7 +91,7 @@
   .toolbar {
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
     position: sticky; top: 130px; z-index: 99;
-    background: rgba(255,248,245,0.95); backdrop-filter: blur(8px);
+    background: rgba(240,244,250,0.95); backdrop-filter: blur(8px);
     padding: 10px 0; margin-bottom: 16px; border-bottom: 1px solid var(--border);
   }
   .btn {
@@ -90,8 +102,8 @@
   .btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
   .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); border-color: transparent; color: #fff; }
   .btn.primary:hover { opacity: 0.88; }
-  .btn.purple { background: linear-gradient(135deg, #c47eff, #a05cff); border-color: transparent; color: #fff; }
-  .btn.green { background: linear-gradient(135deg, #5cd4a8, #3ab890); border-color: transparent; color: #fff; }
+  .btn.purple { background: linear-gradient(135deg, #1a5fb4, #0a2472); border-color: transparent; color: #fff; }
+  .btn.green { background: linear-gradient(135deg, #d4af37, #b8941f); border-color: transparent; color: #fff; }
 
   .section { margin-bottom: 20px; }
   .section-header {
@@ -319,7 +331,7 @@
 
 <header>
   <div class="header-left">
-    <h1>🌸 美里店 業務ダッシュボード</h1>
+    <h1>⚽ 美里店 業務ダッシュボード</h1>
     <div class="sub">MISATO BRANCH · DAILY TOOLS</div>
   </div>
   <div class="today">
@@ -327,6 +339,10 @@
     <div id="datestr">----/--/--</div>
   </div>
 </header>
+
+<div class="trophy-banner">
+  🏆 <span class="gold-text">GOAL!</span> 今日も全力プレーで契約を決めよう ⚽
+</div>
 
 <div class="who-bar">
   <span class="who-label">👤 あなたは？</span>
@@ -341,7 +357,7 @@
 
 <div class="toolbar">
   <span style="flex:1"></span>
-  <button class="btn" onclick="window.location.href='daily_report.html'" style="background:linear-gradient(135deg,#ffcc5c,#ff9a5c);border-color:transparent;color:#fff">📊 日次実績</button>
+  <button class="btn" onclick="window.location.href='daily_report.html'" style="background:linear-gradient(135deg,#d4af37,#b8941f);border-color:transparent;color:#fff">📊 日次実績</button>
   <button class="btn purple" onclick="openStaffModal()">👥 担当者</button>
   <button class="btn green" onclick="openCatModal()">📂 カテゴリ</button>
   <button class="btn" id="editBtn" onclick="toggleEdit()">✏️ 編集</button>
