@@ -6,183 +6,249 @@
 <title>美里店 朝礼・予定管理</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
-
   :root {
-    --bg: #fff5f5;
+    --red: #e60012;
+    --red-light: #ff4444;
+    --red-bg: #fff5f5;
+    --red-border: #ffd0d0;
+    --green: #059669;
+    --orange: #ea580c;
+    --blue: #2563eb;
+    --bg: #f9fafb;
     --surface: #ffffff;
-    --border: #ffd0d0;
-    --accent: #e60012;
-    --accent2: #ff5252;
-    --accent3: #059669;
-    --accent4: #ff8c42;
-    --text: #2a1414;
-    --text-muted: #8a6060;
-    --text-dim: #d8b8b8;
-    --shadow: rgba(230,0,18,0.08);
+    --border: #e5e7eb;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --text-dim: #d1d5db;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.04);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     background: var(--bg);
-    background-image: radial-gradient(circle at 10% 10%, #ffe8e8 0%, transparent 50%),
-                      radial-gradient(circle at 90% 90%, #fff0e8 0%, transparent 50%);
     color: var(--text);
-    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
     min-height: 100vh;
-    padding: 20px 24px;
   }
 
+  /* ヘッダー */
   header {
+    background: var(--surface);
+    border-bottom: 3px solid var(--red);
+    padding: 12px 20px;
     display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 14px; padding-bottom: 14px; border-bottom: 2px solid var(--border);
     position: sticky; top: 0; z-index: 101;
-    background: rgba(255,245,245,0.97); backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
   }
   .header-left h1 {
-    font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 800;
-    color: var(--accent); letter-spacing: -0.02em;
+    font-family: 'Inter', sans-serif;
+    font-size: 17px; font-weight: 800;
+    color: var(--red); letter-spacing: -0.02em;
   }
-  .header-left .sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; letter-spacing: 0.08em; }
-  #clock { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 700; color: var(--accent); text-align:right; }
-  #datestr { font-size: 11px; color: var(--text-muted); text-align:right; margin-top: 1px; }
+  .header-left .sub {
+    font-size: 10px; color: var(--text-muted);
+    letter-spacing: 0.1em; margin-top: 1px;
+  }
+  #clock {
+    font-family: 'Inter', sans-serif;
+    font-size: 20px; font-weight: 700;
+    color: var(--text); text-align: right;
+  }
+  #datestr { font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 1px; }
 
   /* 担当者バー */
   .who-bar {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 10px 16px; margin-bottom: 10px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    box-shadow: 0 2px 8px var(--shadow);
-    position: sticky; top: 62px; z-index: 100;
-    backdrop-filter: blur(10px);
+    position: sticky; top: 57px; z-index: 100;
+    box-shadow: var(--shadow);
   }
-  .who-label { font-size: 11px; color: var(--text-muted); font-weight: 600; white-space: nowrap; letter-spacing: 0.04em; }
+  .who-label {
+    font-size: 11px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+  }
   .staff-pills { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
   .staff-pill {
-    padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border);
-    font-size: 12px; font-weight: 600; cursor: pointer; color: var(--text-muted);
-    background: var(--bg); font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s;
+    padding: 4px 12px; border-radius: 20px;
+    border: 1.5px solid var(--border);
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    color: var(--text-muted); background: var(--bg);
+    font-family: 'Noto Sans JP', sans-serif; transition: all 0.12s;
   }
-  .staff-pill:hover { border-color: var(--accent); color: var(--accent); }
-  .staff-pill.active { color: #fff; font-weight: 700; }
+  .staff-pill:hover { border-color: var(--red); color: var(--red); }
+  .staff-pill.active { background: var(--red); border-color: var(--red); color: #fff; }
   .me-hint { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
 
+  /* メインコンテンツ */
+  .container { max-width: 900px; margin: 0 auto; padding: 16px 16px; }
+
   /* アラート */
-  .alert-bar {
-    background: #fff0f0; border: 1px solid #ffc5c5; border-radius: 8px;
-    padding: 8px 14px; margin-bottom: 10px;
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  .alert {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 8px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 12px; font-weight: 600;
   }
-  .alert-bar.hidden { display: none; }
-  .time-alert {
-    background: #fff8e8; border: 1px solid #ffcc70; border-radius: 8px;
-    padding: 10px 14px; margin-bottom: 10px;
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  }
-  .time-alert.hidden { display: none; }
-  .alert-title { font-size: 12px; font-weight: 700; color: #cc3333; }
-  .time-alert-title { font-size: 12px; font-weight: 700; color: #cc7700; }
+  .alert.hidden { display: none; }
+  .alert-red { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; }
+  .alert-orange { background: #fff7ed; border: 1px solid #fed7aa; color: #ea580c; }
   .alert-chips { display: flex; gap: 5px; flex-wrap: wrap; }
   .alert-chip {
     padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;
-    background: #ffe0e0; color: #cc3333; border: 1px solid #ffb5b5;
+    background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5;
+  }
+  .alert-chip-orange {
+    padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    background: #ffedd5; color: #ea580c; border: 1px solid #fdba74;
   }
 
   /* ツールバー */
-  .toolbar { display: flex; gap: 8px; margin-bottom: 14px; align-items: center; }
+  .toolbar { display: flex; gap: 8px; margin-bottom: 14px; }
   .back-btn {
-    padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--text-muted); font-size: 12px; font-weight: 600;
-    cursor: pointer; font-family: 'Noto Sans JP', sans-serif; transition: all 0.15s;
+    padding: 6px 14px; border-radius: 6px;
+    border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--text-muted);
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; transition: all 0.12s;
   }
-  .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .back-btn:hover { border-color: var(--red); color: var(--red); }
 
+  /* sync */
   .sync-bar {
-    display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
     font-size: 11px; color: var(--text-muted);
-    position: sticky; top: 114px; z-index: 99;
-    background: rgba(255,245,245,0.95); backdrop-filter: blur(8px); padding: 4px 0;
+    margin-bottom: 12px;
   }
-  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+  .sync-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green); animation: pulse 2s infinite;
+  }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* セクション */
-  .section {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-    padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px var(--shadow);
+  /* カード */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
   }
-  .section-title {
-    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
-    margin-bottom: 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-    letter-spacing: -0.01em;
+  .card-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    flex-wrap: wrap;
   }
+  .card-title .badge {
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+  .badge-red { background: var(--red); }
+  .badge-blue { background: var(--blue); }
   .date-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-left: auto; }
-  .reset-btn-sm {
-    padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border);
-    background: var(--bg); font-size: 10px; font-weight: 600; cursor: pointer;
-    font-family: 'Noto Sans JP', sans-serif; color: var(--text-muted); transition: all 0.15s;
+  .reset-btn {
+    padding: 3px 8px; border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg); font-size: 11px; font-weight: 600;
+    cursor: pointer; color: var(--text-muted);
+    font-family: 'Noto Sans JP', sans-serif; transition: all 0.12s;
   }
-  .reset-btn-sm:hover { border-color: #cc3333; color: #cc3333; }
+  .reset-btn:hover { border-color: #dc2626; color: #dc2626; }
 
   /* テーブル */
   .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--bg); }
   th {
-    background: var(--bg); padding: 7px 10px; text-align: center;
-    font-weight: 700; color: var(--text-muted); border-bottom: 2px solid var(--border);
-    white-space: nowrap; font-family: 'Inter', sans-serif; font-size: 12px; letter-spacing: 0.02em;
+    padding: 8px 12px; text-align: center;
+    font-size: 12px; font-weight: 700; color: var(--text-muted);
+    border-bottom: 2px solid var(--border);
+    font-family: 'Inter', sans-serif; white-space: nowrap;
   }
   th.name-col { text-align: left; }
-  td { padding: 7px 10px; text-align: center; border-bottom: 1px solid #f0eaff; vertical-align: middle; }
-  td.name-col { text-align: left; font-weight: 600; }
+  td {
+    padding: 8px 12px; text-align: center;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+  }
+  td.name-col { text-align: left; }
   tr:last-child td { border-bottom: none; }
   tr.total-row td {
-    background: linear-gradient(135deg, #ffe8e8, #fff0e8);
-    font-weight: 800; border-top: 2px solid var(--border); color: var(--accent);
+    background: var(--bg);
+    font-weight: 700;
+    border-top: 2px solid var(--border);
     font-family: 'Inter', sans-serif;
   }
 
-  .num-input {
-    width: 50px; padding: 4px; border-radius: 5px;
-    border: 1px solid var(--border); background: var(--bg);
-    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700;
-    text-align: center; color: var(--text); outline: none; transition: border-color 0.15s;
+  .name-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
   }
-  .num-input:focus { border-color: var(--accent); }
+  .name-dot { width: 7px; height: 7px; border-radius: 50%; }
 
-  .total-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 13px; font-family: 'Inter', sans-serif; }
-  .b1 { background: #ffe8e8; color: #e60012; }
-  .b2 { background: #fff0e8; color: #ff5252; }
-  .b3 { background: #d1fae5; color: #065f46; }
-  .b4 { background: #ffe0f0; color: #c2185b; }
+  .num-input {
+    width: 52px; padding: 5px 4px;
+    border-radius: 6px; border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 700;
+    text-align: center; color: var(--text); outline: none;
+    transition: border-color 0.12s;
+  }
+  .num-input:focus { border-color: var(--red); background: #fff; }
 
-  .staff-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
-  .staff-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .total-num {
+    display: inline-block; padding: 3px 10px; border-radius: 6px;
+    font-weight: 700; font-size: 14px;
+    font-family: 'Inter', sans-serif;
+  }
+  .t-red { background: #fef2f2; color: var(--red); }
+  .t-blue { background: #eff6ff; color: var(--blue); }
+  .t-green { background: #f0fdf4; color: var(--green); }
+  .t-orange { background: #fff7ed; color: var(--orange); }
 
   /* 提出セクション */
-  .submit-section {
-    background: var(--surface); border: 1px solid var(--accent2); border-radius: 10px;
-    padding: 14px 16px; margin-bottom: 14px; box-shadow: 0 2px 8px var(--shadow);
+  .submit-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
   }
-  .submit-title {
-    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
-    color: var(--accent); margin-bottom: 10px; letter-spacing: -0.01em;
+  .submit-card-title {
+    font-size: 12px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-bottom: 10px;
   }
-  .submitted-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; min-height: 26px; align-items: center; }
-  .submitted-chip { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .submitted-chips { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; min-height: 24px; align-items: center; }
+  .submitted-chip {
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 11px; font-weight: 600;
+  }
 
   .submit-btn {
-    padding: 7px 18px; border-radius: 6px; font-size: 12px; font-weight: 700;
-    border: none; color: #fff; cursor: pointer; font-family: 'Noto Sans JP', sans-serif;
-    transition: all 0.15s; letter-spacing: 0.02em;
+    padding: 7px 18px; border-radius: 6px;
+    border: none; color: #fff;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif; transition: all 0.12s;
   }
-  .submit-btn.today-btn { background: linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow: 0 2px 8px var(--shadow); }
-  .submit-btn.tomorrow-btn { background: linear-gradient(135deg, #ff5252, #0284c7); box-shadow: 0 2px 8px rgba(255,82,82,0.15); }
-  .submit-btn.resubmit { background: linear-gradient(135deg, #d97706, #b45309); }
-  .submit-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+  .submit-btn.today-btn { background: var(--red); }
+  .submit-btn.tomorrow-btn { background: var(--blue); }
+  .submit-btn.resubmit { background: var(--orange); }
+  .submit-btn:hover:not(:disabled) { opacity: 0.85; transform: translateY(-1px); box-shadow: var(--shadow-md); }
   .submit-note { font-size: 10px; color: var(--text-muted); margin-left: 8px; }
+
+  /* divider */
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
 </style>
 </head>
 <body>
@@ -204,131 +270,138 @@
   <span class="me-hint" id="meHint">名前を選んでください</span>
 </div>
 
-<div class="sync-bar">
-  <div class="sync-dot" id="syncDot"></div>
-  <span id="syncText">接続中...</span>
-</div>
+<div class="container">
 
-<div class="time-alert hidden" id="timeAlert">
-  <span class="time-alert-title">⚠ 18:00を過ぎました。翌日予定を提出してから退勤してください。</span>
-  <div class="alert-chips" id="timeAlertChips"></div>
-</div>
-
-<div class="alert-bar hidden" id="todayAlertBar">
-  <span class="alert-title">本日予定 未提出：</span>
-  <div class="alert-chips" id="todayAlertChips"></div>
-</div>
-
-<div class="alert-bar hidden" id="alertBar" style="border-color:#ffaa55;background:#fff8e8">
-  <span class="alert-title" style="color:#cc7700">翌日予定 未提出：</span>
-  <div class="alert-chips" id="alertChips"></div>
-</div>
-
-<div class="toolbar">
-  <button class="back-btn" onclick="window.location.href='index.html'">← ダッシュボード</button>
-</div>
-
-<!-- 本日予定 -->
-<div class="section">
-  <div class="section-title" style="color:var(--accent)">
-    本日予定
-    <span class="date-label" id="todayLabel"></span>
-    <button class="reset-btn-sm" onclick="resetTable('today')">リセット</button>
+  <div class="sync-bar" style="margin-top:12px">
+    <div class="sync-dot" id="syncDot"></div>
+    <span id="syncText">接続中...</span>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th class="name-col">担当者</th>
-          <th>面談</th><th>案内</th><th>契約</th><th>写真撮り</th>
-        </tr>
-      </thead>
-      <tbody id="todayBody"></tbody>
-    </table>
-  </div>
-</div>
 
-<div class="submit-section">
-  <div class="submit-title">本日予定 提出状況</div>
-  <div class="submitted-chips" id="todaySubmittedChips">
-    <span style="color:var(--text-dim);font-size:11px">未提出</span>
+  <!-- アラート -->
+  <div class="alert alert-orange hidden" id="timeAlert">
+    <span>⚠ 18:00を過ぎました。翌日予定を提出してから退勤してください。</span>
+    <div class="alert-chips" id="timeAlertChips"></div>
   </div>
-  <button class="submit-btn today-btn" id="todaySubmitBtn" onclick="submitToday()">本日予定を提出</button>
-  <span class="submit-note">※0件・修正後も押してください</span>
-</div>
+  <div class="alert alert-red hidden" id="todayAlertBar">
+    <span>本日予定 未提出：</span>
+    <div class="alert-chips" id="todayAlertChips"></div>
+  </div>
+  <div class="alert alert-orange hidden" id="tomorrowAlertBar">
+    <span>翌日予定 未提出：</span>
+    <div class="alert-chips" id="tomorrowAlertChips"></div>
+  </div>
 
-<!-- 翌日予定 -->
-<div class="section">
-  <div class="section-title" style="color:#ff5252">
-    翌日予定
-    <span class="date-label" id="tomorrowLabel"></span>
-    <button class="reset-btn-sm" onclick="resetTable('tomorrow')">リセット</button>
+  <div class="toolbar">
+    <button class="back-btn" onclick="window.location.href='index.html'">← ダッシュボード</button>
   </div>
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th class="name-col">担当者</th>
-          <th>面談</th><th>案内</th><th>契約</th><th>写真撮り</th>
-        </tr>
-      </thead>
-      <tbody id="tomorrowBody"></tbody>
-    </table>
-  </div>
-</div>
 
-<div class="submit-section" style="border-color:#ff5252">
-  <div class="submit-title" style="color:#ff5252">翌日予定 提出状況</div>
-  <div class="submitted-chips" id="tomorrowSubmittedChips">
-    <span style="color:var(--text-dim);font-size:11px">未提出</span>
+  <!-- 本日予定 -->
+  <div class="card">
+    <div class="card-title">
+      <span class="badge badge-red">本日予定</span>
+      <span class="date-label" id="todayLabel"></span>
+      <button class="reset-btn" onclick="resetTable('today')">リセット</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="name-col">担当者</th>
+            <th>面談</th><th>案内</th><th>契約</th><th>写真撮り</th>
+          </tr>
+        </thead>
+        <tbody id="todayBody"></tbody>
+      </table>
+    </div>
   </div>
-  <button class="submit-btn tomorrow-btn" id="tomorrowSubmitBtn" onclick="submitTomorrow()">翌日予定を提出</button>
-  <span class="submit-note">※0件・修正後も押してください</span>
-</div>
+
+  <div class="submit-card">
+    <div class="submit-card-title">本日予定 提出状況</div>
+    <div class="submitted-chips" id="todaySubmittedChips">
+      <span style="color:var(--text-dim);font-size:11px">未提出</span>
+    </div>
+    <button class="submit-btn today-btn" id="todaySubmitBtn" onclick="submitToday()">本日予定を提出</button>
+    <span class="submit-note">※0件・修正後も押してください</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 翌日予定 -->
+  <div class="card">
+    <div class="card-title">
+      <span class="badge badge-blue">翌日予定</span>
+      <span class="date-label" id="tomorrowLabel"></span>
+      <button class="reset-btn" onclick="resetTable('tomorrow')">リセット</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="name-col">担当者</th>
+            <th>面談</th><th>案内</th><th>契約</th><th>写真撮り</th>
+          </tr>
+        </thead>
+        <tbody id="tomorrowBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="submit-card" style="border-color:#bfdbfe">
+    <div class="submit-card-title" style="color:var(--blue)">翌日予定 提出状況</div>
+    <div class="submitted-chips" id="tomorrowSubmittedChips">
+      <span style="color:var(--text-dim);font-size:11px">未提出</span>
+    </div>
+    <button class="submit-btn tomorrow-btn" id="tomorrowSubmitBtn" onclick="submitTomorrow()">翌日予定を提出</button>
+    <span class="submit-note">※0件・修正後も押してください</span>
+  </div>
+
+</div><!-- /container -->
 
 <script>
 const firebaseConfig = { databaseURL: "https://misato-dashboard-default-rtdb.firebaseio.com/" };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const COLORS = ['#6d28d9','#ff5252','#059669','#db2777','#d97706','#0891b2','#7c3aed','#be185d'];
+const COLORS = ['#e60012','#2563eb','#059669','#ea580c','#7c3aed','#0891b2','#be185d','#ca8a04'];
 const FIELD_KEYS = ['mendan','annai','keiyaku','shashin'];
-const BADGE_CLASSES = ['b1','b2','b3','b4'];
+const TOTAL_CLASSES = ['t-red','t-blue','t-green','t-orange'];
 const EXCLUDE = ['\u69ae','\u677e\u7530'];
 
 let staffList = [];
 let reportData = {};
-let reportTomorrowData = {};
 let currentUser = localStorage.getItem('misato_me') || '';
 
+// 時計
 function updateClock() {
   const now = new Date();
   const pad = function(n) { return String(n).padStart(2,'0'); };
   document.getElementById('clock').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes());
   const days = ['\u65e5','\u6708','\u706b','\u6c34','\u6728','\u91d1','\u571f'];
   document.getElementById('datestr').textContent =
-    now.getFullYear() + '/' + pad(now.getMonth()+1) + '/' + pad(now.getDate()) + ' (' + days[now.getDay()] + ')';
+    now.getFullYear() + '/' + pad(now.getMonth()+1) + '/' + pad(now.getDate()) + '(' + days[now.getDay()] + ')';
 }
 setInterval(updateClock, 1000);
 updateClock();
 
 function dateKey(offset) {
   offset = offset || 0;
-  const n = new Date();
-  n.setDate(n.getDate() + offset);
+  const n = new Date(); n.setDate(n.getDate() + offset);
   const pad = function(x) { return String(x).padStart(2,'0'); };
   return n.getFullYear() + '_' + pad(n.getMonth()+1) + '_' + pad(n.getDate());
 }
-
 function dateLabel(offset) {
   offset = offset || 0;
-  const n = new Date();
-  n.setDate(n.getDate() + offset);
+  const n = new Date(); n.setDate(n.getDate() + offset);
   const pad = function(x) { return String(x).padStart(2,'0'); };
   const days = ['\u65e5','\u6708','\u706b','\u6c34','\u6728','\u91d1','\u571f'];
-  return n.getFullYear() + '/' + pad(n.getMonth()+1) + '/' + pad(n.getDate()) + ' (' + days[n.getDay()] + ')';
+  return n.getFullYear() + '/' + pad(n.getMonth()+1) + '/' + pad(n.getDate()) + '(' + days[n.getDay()] + ')';
 }
 
+function setSyncOk(msg) {
+  document.getElementById('syncText').textContent = msg;
+}
+
+// 担当者ボタン
 function renderStaff() {
   const wrap = document.getElementById('staffPills');
   wrap.innerHTML = '';
@@ -341,7 +414,6 @@ function renderStaff() {
     if (currentUser === name) {
       btn.style.background = col;
       btn.style.borderColor = col;
-      btn.style.color = '#fff';
     }
     btn.onclick = function() {
       currentUser = name;
@@ -356,12 +428,7 @@ function renderStaff() {
     currentUser ? currentUser + ' \u30ed\u30b0\u30a4\u30f3\u4e2d' : '\u540d\u524d\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044';
 }
 
-function setSyncOk(msg) {
-  document.getElementById('syncDot').className = 'sync-dot';
-  document.getElementById('syncText').textContent = msg;
-}
-
-// 日付変更チェック・自動リセット
+// 日付変更チェック
 function checkDateChange() {
   const lastDate = localStorage.getItem('report_last_date');
   const today = dateKey(0);
@@ -374,52 +441,55 @@ function checkDateChange() {
   localStorage.setItem('report_last_date', today);
 }
 
+// 初期化
 function init() {
   checkDateChange();
 
   db.ref('staff').on('value', function(snap) {
     const val = snap.val();
-    staffList = val ? (Array.isArray(val) ? val : Object.values(val)) : ['\u69ae','\u6c60\u7530','\u85cf\u4e0b','\u5c0f\u6a4b\u5ddd','\u5927\u897f','\u517c\u672c','\u677e\u7530','\u4e88\u5099'];
+    staffList = val ? (Array.isArray(val) ? val : Object.values(val))
+      : ['\u69ae','\u6c60\u7530','\u85cf\u4e0b','\u5c0f\u6a4b\u5ddd','\u5927\u897f','\u517c\u672c','\u677e\u7530','\u4e88\u5099'];
     renderStaff();
   });
 
   db.ref('report_tomorrow').on('value', function(snap) {
     reportTomorrowData = snap.val() || {};
+    renderTable('tomorrowBody', dateKey(0), 'report_tomorrow');
+    document.getElementById('tomorrowLabel').textContent = dateLabel(1);
   });
 
   db.ref('report').on('value', function(snap) {
     reportData = snap.val() || {};
 
-    // 自動引き継ぎ（本日データが空なら昨日の翌日予定をコピー）
     const todayKey_ = dateKey(0);
     const yestKey = dateKey(-1);
     const todayData = reportData[todayKey_];
-    const yestData = reportData[yestKey];
     const todayHasData = todayData && Object.values(todayData).some(function(s) {
       return s && Object.values(s).some(function(v) { return v > 0; });
     });
 
-    if (!todayHasData && yestData) {
-      const updates = {};
-      Object.keys(yestData).forEach(function(name) {
-        const fields = yestData[name];
-        if (fields) {
-          Object.keys(fields).forEach(function(fkey) {
-            updates['report/' + todayKey_ + '/' + name + '/' + fkey] = fields[fkey];
+    if (!todayHasData) {
+      db.ref('report_tomorrow/' + yestKey).once('value').then(function(snap2) {
+        const yestTomorrow = snap2.val();
+        if (yestTomorrow && Object.keys(yestTomorrow).length > 0) {
+          const updates = {};
+          Object.keys(yestTomorrow).forEach(function(name) {
+            const fields = yestTomorrow[name];
+            if (fields) {
+              Object.keys(fields).forEach(function(fkey) {
+                updates['report/' + todayKey_ + '/' + name + '/' + fkey] = fields[fkey];
+              });
+            }
+          });
+          db.ref().update(updates).then(function() {
+            setSyncOk('\u6628\u65e5\u306e\u7fcc\u65e5\u4e88\u5b9a\u3092\u672c\u65e5\u306b\u81ea\u52d5\u5f15\u304d\u7d99\u304e\u3057\u307e\u3057\u305f');
           });
         }
       });
-      if (Object.keys(updates).length > 0) {
-        db.ref().update(updates);
-        setSyncOk('\u6628\u65e5\u306e\u7fcc\u65e5\u4e88\u5b9a\u3092\u672c\u65e5\u306b\u81ea\u52d5\u5f15\u304d\u7d99\u304e\u3057\u307e\u3057\u305f');
-        return;
-      }
     }
 
-    renderTable('todayBody', dateKey(0), 'report');
-    renderTable('tomorrowBody', dateKey(0), 'report_tomorrow');
+    renderTable('todayBody', todayKey_, 'report');
     document.getElementById('todayLabel').textContent = dateLabel(0);
-    document.getElementById('tomorrowLabel').textContent = dateLabel(1);
     setSyncOk('\u540c\u671f\u6e08\u307f');
     checkTimeAlert();
   });
@@ -428,23 +498,28 @@ function init() {
   updateSubmitUI('tomorrow');
 }
 
+// テーブル描画
 function renderTable(tbodyId, key, tableName) {
-  tableName = tableName || 'report';
   const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
   tbody.innerHTML = '';
   const totals = {mendan:0,annai:0,keiyaku:0,shashin:0};
   const filtered = staffList.filter(function(n) { return EXCLUDE.indexOf(n) === -1; });
+  const tableData = reportData;
 
   filtered.forEach(function(name, idx) {
     const col = COLORS[idx % COLORS.length];
-    const tableData = tableName === 'report' ? reportData : reportTomorrowData;
     const data = (tableData[key] && tableData[key][name]) || {};
     const tr = document.createElement('tr');
-    let cells = '<td class="name-col"><span class="staff-badge" style="background:' + col + '18;color:' + col + '"><span class="staff-dot" style="background:' + col + '"></span>' + name + '</span></td>';
+    let cells = '<td class="name-col"><span class="name-tag" style="background:' + col + '15;color:' + col + '">'
+      + '<span class="name-dot" style="background:' + col + '"></span>' + name + '</span></td>';
     FIELD_KEYS.forEach(function(fkey) {
       const val = data[fkey] || 0;
       totals[fkey] += val;
-      cells += '<td><input class="num-input" type="number" min="0" value="' + val + '" data-key="' + key + '" data-name="' + name + '" data-field="' + fkey + '" data-tbody="' + tbodyId + '" data-table="' + tableName + '" onchange="updateValue(this)"></td>';
+      cells += '<td><input class="num-input" type="number" min="0" value="' + val
+        + '" data-key="' + key + '" data-name="' + name
+        + '" data-field="' + fkey + '" data-tbody="' + tbodyId
+        + '" data-table="' + tableName + '" onchange="updateValue(this)"></td>';
     });
     tr.innerHTML = cells;
     tbody.appendChild(tr);
@@ -452,9 +527,9 @@ function renderTable(tbodyId, key, tableName) {
 
   const totalTr = document.createElement('tr');
   totalTr.className = 'total-row';
-  let tc = '<td class="name-col">\u5408\u8a08</td>';
+  let tc = '<td class="name-col" style="font-weight:700;font-size:12px;color:var(--text-muted)">\u5408\u8a08</td>';
   FIELD_KEYS.forEach(function(fkey, i) {
-    tc += '<td><span class="total-badge ' + BADGE_CLASSES[i] + '" id="total_' + tbodyId + '_' + fkey + '">' + totals[fkey] + '</span></td>';
+    tc += '<td><span class="total-num ' + TOTAL_CLASSES[i] + '" id="total_' + tbodyId + '_' + fkey + '">' + totals[fkey] + '</span></td>';
   });
   totalTr.innerHTML = tc;
   tbody.appendChild(totalTr);
@@ -465,9 +540,8 @@ function updateValue(input) {
   const name = input.dataset.name;
   const field = input.dataset.field;
   const tbodyId = input.dataset.tbody;
-  const tableName = input.dataset.table || 'report';
   const val = parseInt(input.value) || 0;
-  db.ref(tableName + '/' + key + '/' + name + '/' + field).set(val);
+  db.ref('report/' + key + '/' + name + '/' + field).set(val);
   const inputs = document.querySelectorAll('#' + tbodyId + ' input[data-field="' + field + '"]');
   let total = 0;
   inputs.forEach(function(inp) { total += parseInt(inp.value) || 0; });
@@ -476,15 +550,16 @@ function updateValue(input) {
 }
 
 function resetTable(which) {
-  const key = which === 'today' ? dateKey(0) : dateKey(1);
+  const key = dateKey(0);
   const label = which === 'today' ? '\u672c\u65e5\u4e88\u5b9a' : '\u7fcc\u65e5\u4e88\u5b9a';
+  const reportKey = which === 'today' ? 'report' : 'report_tomorrow';
   const dbKey = which === 'today' ? 'submitted_today' : 'submitted';
   if (!confirm(label + '\u3068\u63d0\u51fa\u72b6\u6cc1\u3092\u30ea\u30bb\u30c3\u30c8\u3057\u307e\u3059\u304b\uff1f')) return;
   const filtered = staffList.filter(function(n) { return EXCLUDE.indexOf(n) === -1; });
   const updates = {};
   filtered.forEach(function(name) {
     FIELD_KEYS.forEach(function(fkey) {
-      updates['report/' + key + '/' + name + '/' + fkey] = 0;
+      updates[reportKey + '/' + key + '/' + name + '/' + fkey] = 0;
     });
   });
   updates[dbKey + '/' + key] = null;
@@ -527,7 +602,7 @@ function updateSubmitUI(which) {
     if (submitted.length > 0) {
       chips.innerHTML = submitted.map(function(n, i) {
         const col = COLORS[i % COLORS.length];
-        return '<span class="submitted-chip" style="background:' + col + '18;color:' + col + ';border:1px solid ' + col + '44">' + n + ' ✓</span>';
+        return '<span class="submitted-chip" style="background:' + col + '15;color:' + col + ';border:1px solid ' + col + '44">' + n + ' ✓</span>';
       }).join('');
     } else {
       chips.innerHTML = '<span style="color:var(--text-dim);font-size:11px">\u672a\u63d0\u51fa</span>';
@@ -547,39 +622,41 @@ function updateSubmitUI(which) {
     const unsubmitted = filtered.filter(function(n) { return submitted.indexOf(n) === -1; });
 
     if (which === 'today') {
-      const todayAlertBar = document.getElementById('todayAlertBar');
-      const todayAlertChips = document.getElementById('todayAlertChips');
+      const bar = document.getElementById('todayAlertBar');
+      const achips = document.getElementById('todayAlertChips');
       if (unsubmitted.length > 0) {
-        todayAlertBar.classList.remove('hidden');
-        todayAlertChips.innerHTML = unsubmitted.map(function(n) { return '<span class="alert-chip">' + n + '</span>'; }).join('');
-      } else {
-        todayAlertBar.classList.add('hidden');
-      }
+        bar.classList.remove('hidden');
+        achips.innerHTML = unsubmitted.map(function(n) { return '<span class="alert-chip">' + n + '</span>'; }).join('');
+      } else { bar.classList.add('hidden'); }
     }
 
     if (which === 'tomorrow') {
-      const alertBar = document.getElementById('alertBar');
-      const alertChips = document.getElementById('alertChips');
+      const bar = document.getElementById('tomorrowAlertBar');
+      const achips = document.getElementById('tomorrowAlertChips');
       if (unsubmitted.length > 0) {
-        alertBar.classList.remove('hidden');
-        alertChips.innerHTML = unsubmitted.map(function(n) { return '<span class="alert-chip" style="background:#fff0d0;color:#cc7700;border-color:#ffcc70">' + n + '</span>'; }).join('');
-      } else {
-        alertBar.classList.add('hidden');
-      }
-      const now = new Date();
-      const timeAlert = document.getElementById('timeAlert');
-      const timeChips = document.getElementById('timeAlertChips');
-      if (now.getHours() >= 18 && unsubmitted.length > 0) {
-        timeAlert.classList.remove('hidden');
-        timeChips.innerHTML = unsubmitted.map(function(n) { return '<span class="alert-chip">' + n + '</span>'; }).join('');
-      } else {
-        timeAlert.classList.add('hidden');
-      }
+        bar.classList.remove('hidden');
+        achips.innerHTML = unsubmitted.map(function(n) { return '<span class="alert-chip-orange">' + n + '</span>'; }).join('');
+      } else { bar.classList.add('hidden'); }
+      checkTimeAlert(unsubmitted);
     }
   });
 }
 
-function checkTimeAlert() { updateSubmitUI('tomorrow'); }
+function checkTimeAlert(unsubmitted) {
+  const now = new Date();
+  const bar = document.getElementById('timeAlert');
+  const chips = document.getElementById('timeAlertChips');
+  if (!unsubmitted) {
+    unsubmitted = staffList.filter(function(n) { return EXCLUDE.indexOf(n) === -1; });
+  }
+  if (now.getHours() >= 18 && unsubmitted.length > 0) {
+    bar.classList.remove('hidden');
+    chips.innerHTML = unsubmitted.map(function(n) { return '<span class="alert-chip-orange">' + n + '</span>'; }).join('');
+  } else {
+    bar.classList.add('hidden');
+  }
+}
+
 setInterval(function() { checkTimeAlert(); }, 60000);
 init();
 </script>
