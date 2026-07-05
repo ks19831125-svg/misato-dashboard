@@ -498,7 +498,7 @@ function renderTable(tbodyId, key) {
       cells += '<td><input class="num-input" type="number" min="0" value="' + val
         + '" data-key="' + key + '" data-name="' + name
         + '" data-field="' + fkey + '" data-tbody="' + tbodyId
-        + '" data-table="' + tableName + '" onchange="updateValue(this)"></td>';
+        + '" onchange="updateValue(this)"></td>';
     });
     tr.innerHTML = cells;
     tbody.appendChild(tr);
