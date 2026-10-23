@@ -6,6 +6,7 @@
 <title>美里店 業務ダッシュボード</title>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Nunito:wght@400;600;700;800&display=swap');
 
@@ -426,9 +427,97 @@
   </div>
 </div>
 
+<!-- ===== ログイン画面（共通アカウント） ===== -->
+<style>
+#lgOverlay{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:20px;background:#f0f4fa;font-family:'Noto Sans JP',sans-serif}
+#lgOverlay.show{display:flex}
+.lg-box{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 10px 40px rgba(0,0,0,.15)}
+.lg-box h2{font-size:18px;margin-bottom:6px;color:#0a2472}
+.lg-box p{font-size:12px;color:#4a5a7a;margin-bottom:16px;line-height:1.6}
+.lg-box input{width:100%;padding:10px 12px;margin-bottom:10px;border:2px solid #c5d5f0;border-radius:10px;font-size:16px;font-family:inherit;outline:none;box-sizing:border-box}
+.lg-box input:focus{border-color:#0a2472}
+.lg-box button{width:100%;padding:11px;border:none;border-radius:10px;background:#0a2472;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+.lg-box button:disabled{opacity:.6;cursor:default}
+#lgErr{color:#c0392b;font-size:12px;min-height:18px;margin-bottom:8px}
+#lgLogout{position:fixed;right:10px;bottom:10px;z-index:99998;font-size:11px;padding:4px 10px;border-radius:12px;border:1px solid #c5d5f0;background:rgba(255,255,255,.92);color:#4a5a7a;cursor:pointer;display:none;font-family:inherit}
+</style>
+<div id="lgOverlay">
+  <form class="lg-box" id="lgForm">
+    <h2>美里店 ログイン</h2>
+    <p>店舗共通のメールアドレスとパスワードを入力してください。一度ログインすると、この端末ではそのまま使えます。</p>
+    <input type="email" id="lgEmail" placeholder="メールアドレス" autocomplete="username" required>
+    <input type="password" id="lgPass" placeholder="パスワード" autocomplete="current-password" required>
+    <div id="lgErr"></div>
+    <button type="submit" id="lgBtn">ログイン</button>
+  </form>
+</div>
+<button id="lgLogout" type="button">ログアウト</button>
 <script>
-const firebaseConfig = { databaseURL: "https://misato-dashboard-default-rtdb.firebaseio.com/" };
-firebase.initializeApp(firebaseConfig);
+(function () {
+  var cfg = {
+    apiKey: "AIzaSyD4p5WiUnQjb5j_iwdCawXRK-IecEC5wsE",
+    authDomain: "misato-dashboard.firebaseapp.com",
+    databaseURL: "https://misato-dashboard-default-rtdb.firebaseio.com",
+    projectId: "misato-dashboard"
+  };
+  firebase.initializeApp(cfg);
+
+  var started = false;
+  var ov = document.getElementById('lgOverlay');
+  var errEl = document.getElementById('lgErr');
+  var btn = document.getElementById('lgBtn');
+  var lo = document.getElementById('lgLogout');
+
+  // ログイン後に、本体のスクリプトを初めて実行する（ログイン前はデータを一切読み書きしない）
+  function startApp() {
+    if (started) return;
+    started = true;
+    var s = document.createElement('script');
+    s.text = document.getElementById('appScript').textContent;
+    document.body.appendChild(s);
+  }
+
+  firebase.auth().onAuthStateChanged(function (user) {
+    if (user) {
+      ov.classList.remove('show');
+      lo.style.display = 'block';
+      startApp();
+    } else {
+      if (started) { location.reload(); return; }
+      ov.classList.add('show');
+      lo.style.display = 'none';
+    }
+  });
+
+  document.getElementById('lgForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    errEl.textContent = '';
+    btn.disabled = true;
+    btn.textContent = '確認中...';
+    var email = document.getElementById('lgEmail').value.trim();
+    var pass = document.getElementById('lgPass').value;
+    firebase.auth().signInWithEmailAndPassword(email, pass).catch(function (err) {
+      var c = err && err.code || '';
+      var msg;
+      if (c === 'auth/invalid-credential' || c === 'auth/wrong-password' || c === 'auth/user-not-found' || c === 'auth/invalid-email') {
+        msg = 'メールアドレスかパスワードが違います';
+      } else if (c === 'auth/too-many-requests') {
+        msg = '試行回数が多すぎます。しばらくしてからやり直してください';
+      } else if (c === 'auth/network-request-failed') {
+        msg = '通信できません。ネットワークを確認してください';
+      } else {
+        msg = 'ログインできませんでした (' + (c || 'unknown') + ')';
+      }
+      errEl.textContent = msg;
+      btn.disabled = false;
+      btn.textContent = 'ログイン';
+    });
+  });
+
+  lo.addEventListener('click', function () { firebase.auth().signOut(); });
+})();
+</script>
+<script type="text/plain" id="appScript">
 const db = firebase.database();
 
 const STAFF_COLORS = ['#ff7eb3','#ff9a5c','#5cd4a8','#7eb3ff','#c47eff','#ffcc5c','#ff7070','#a0c4ff','#f7a8d4','#a8d4f7'];
